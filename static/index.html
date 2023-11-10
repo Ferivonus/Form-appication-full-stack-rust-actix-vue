@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Actix Web Page</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+</head>
+<body>
+    <h1>Hello, Actix Web!</h1>
+    <p>Welcome to my Actix web page. This is a sample HTML page.</p>
+    
+    <form>
+        <label for="name">Enter your name:</label>
+        <input type="text" id="name" name="name" required>
+        <button type="submit">Say Hello</button>
+    </form>
+    
+    <p>Dynamic content: <span id="dynamic-content">Loading...</span></p>
+    
+    <script>
+        const form = document.querySelector('form'); // Select the form element on the page
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault(); // Prevent the page from being reloaded when the form is submitted
+
+    const nameInput = document.getElementById('name');
+    const dynamicContent = document.getElementById('dynamic-content');
+
+    const name = nameInput.value; // Get the name entered by the user
+
+    try {
+        // Make a GET request to the `/api/hello/{name}` endpoint
+        const response = await fetch(`/api/hello/${name}`);
+
+        if (response.ok) {
+            // If the request is successful, get the response as text
+            const data = await response.text();
+            dynamicContent.textContent = data; // Display the response on the page
+        } else {
+            // If the request is unsuccessful, display an error message
+            dynamicContent.textContent = 'Error: ' + response.status;
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        dynamicContent.textContent = 'An error occurred.';
+    }
+});
+
+    </script>
+</body>
+</html>
