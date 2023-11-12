@@ -1,0 +1,17 @@
+{
+  "name": "mentorwebsitefront",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.2.3",
+    "vite": "^4.3.9"
+  },
+  "dependencies": {
+    "vue-router": "^4.0.13"
+  }
+}

@@ -5,8 +5,6 @@ use serde_json::json;
 
 mod links;
 
-
-
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let mut handlebars = Handlebars::new();
