@@ -18,12 +18,9 @@
 			
 		</span>
 
-		to your new<br />SvelteKit app
+		Bebike<br />hoşgeldin
 	</h1>
 
-	<h2>
-		try editing <strong>src/routes/+page.svelte</strong>
-	</h2>
 
 	<Counter />
 </section>
