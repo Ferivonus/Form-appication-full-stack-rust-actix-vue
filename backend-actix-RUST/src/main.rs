@@ -56,7 +56,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
 
         let cors = Cors::default()
-            .allowed_origin("http://wulvahiv5zqfrgqo3ceavahsfakxjvp2oqe53sihlq2cuqhzqmea6yqd.onion")
+            .allowed_origin("http://localhost:8080")
             .allowed_methods(vec!["GET", "POST", "PATCH", "DELETE"])
             .allowed_headers(vec![
                 header::CONTENT_TYPE,
@@ -71,9 +71,7 @@ async fn main() -> std::io::Result<()> {
             .configure(handler::config)
             .wrap(cors)
             .wrap(Logger::default())
-            .configure(links::config)
             .route("/", web::get().to(|| async { HttpResponse::Ok().body("Home Page") }))
-            .route("/hello/{name}", web::get().to(links::greet_user))
             .route("/bookpage", web::get().to(links::book_page))
             .service(
                 web::resource("/index.html")
@@ -88,7 +86,6 @@ async fn main() -> std::io::Result<()> {
             .service(
                 actix_files::Files::new("/static", "static").show_files_listing()
             )
-            .service(web::scope("/api").configure(links::scoped_config))
     })
     .bind("127.0.0.1:8080")?
     // .bind("127.0.0.1:80")? masal için tor (These lines are commented out)

@@ -8,11 +8,11 @@ use crate::{
 use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 use serde_json::json;
 
-#[get("/formapplicationchecker")]
+#[get("/api_info")]
 async fn form_checker_handler() -> impl Responder {
     const MESSAGE: &str = "Form system CRUD API with Rust, SQLX, MySQL, and Actix Web";
 
-    HttpResponse::Ok().json(json!({"status": "success","message": MESSAGE}))
+    HttpResponse::Ok().json(json!({"status": "success","form_message": MESSAGE}))
 }
 
 #[get("/messages")]
@@ -53,11 +53,12 @@ async fn create_message_handler(
 ) -> impl Responder {
     let user_id = uuid::Uuid::new_v4().to_string();
     let query_result =
-        sqlx::query(r#"INSERT INTO form_messages (id,title,content,form_title) VALUES (?, ?, ?, ?)"#)
+        sqlx::query(r#"INSERT INTO form_messages (id,title,content,form_title,published) VALUES (?, ?, ?, ?, ?)"#)
             .bind(user_id.clone())
             .bind(body.title.to_string())
             .bind(body.content.to_string())
             .bind(body.form_title.to_owned().unwrap_or_default())
+            .bind(body.published.to_owned().unwrap_or_default())
             .execute(&data.db)
             .await
             .map_err(|err: sqlx::Error| err.to_string());
@@ -65,12 +66,12 @@ async fn create_message_handler(
     if let Err(err) = query_result {
         if err.contains("Duplicate entry") {
             return HttpResponse::BadRequest().json(
-            serde_json::json!({"status": "fail","message": "Note with that title already exists"}),
+            serde_json::json!({"status": "fail","form_message": "Note with that title already exists"}),
         );
         }
 
         return HttpResponse::InternalServerError()
-            .json(serde_json::json!({"status": "error","message": format!("{:?}", err)}));
+            .json(serde_json::json!({"status": "error","form_message": format!("{:?}", err)}));
     }
 
     println!("🚀 messages part worked without id");
@@ -90,7 +91,7 @@ async fn create_message_handler(
         }
         Err(e) => {
             return HttpResponse::InternalServerError()
-                .json(serde_json::json!({"status": "error","message": format!("{:?}", e)}));
+                .json(serde_json::json!({"status": "error","form_message": format!("{:?}", e)}));
         }
     }
 }

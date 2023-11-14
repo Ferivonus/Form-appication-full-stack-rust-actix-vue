@@ -30,12 +30,13 @@
 
     <script>
         async function createMessage() {
-    const url = 'http://wulvahiv5zqfrgqo3ceavahsfakxjvp2oqe53sihlq2cuqhzqmea6yqd.onion/api/messages/';
+    const url = 'http://localhost:8080/api/messages/';
 
     const messageData = {
         title: document.getElementById('title').value,
         content: document.getElementById('content').value,
         form_title: document.getElementById('formTitle').value,
+        published: true,
     };
 
     try {
@@ -63,7 +64,7 @@
 
         // Function to fetch and display messages
         async function fetchMessages() {
-            const url = 'http://wulvahiv5zqfrgqo3ceavahsfakxjvp2oqe53sihlq2cuqhzqmea6yqd.onion/api/messages';
+            const url = 'http://localhost:8080/api/messages';
 
             try {
                 const response = await fetch(url);
