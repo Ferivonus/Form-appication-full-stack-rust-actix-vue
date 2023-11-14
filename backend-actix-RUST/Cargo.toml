@@ -14,3 +14,11 @@ serde = { version = "1.0.192", features = ["derive"] }
 serde_json = "1.0.108"
 rand = "0.8.5"
 handlebars = "4.5.0"  # Add this line for Handlebars template support
+r2d2 = "0.8.10"
+
+actix-cors = "0.6.4"
+chrono = { version = "0.4.23", features = ["serde"] }
+dotenv = "0.15.0"
+env_logger = "0.10.0"
+sqlx = { version = "0.7.2", features = ["runtime-async-std-native-tls", "mysql", "chrono", "uuid"] }
+uuid = { version = "1.2.2", features = ["serde", "v4"] }
