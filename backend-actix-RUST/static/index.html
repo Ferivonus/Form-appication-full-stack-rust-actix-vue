@@ -5,46 +5,96 @@
     <link rel="stylesheet" type="text/css" href="/static/css/style.css">
 </head>
 <body>
-    <h1>Hello, Actix Web!</h1>
+    <h1>Hello, Actix Web!!</h1>
     <p>Welcome to my Actix web page. This is a sample HTML page.</p>
-    
-    <form>
-        <label for="name">Enter your name:</label>
-        <input type="text" id="name" name="name" required>
-        <button type="submit">Say Hello</button>
+    <h1>Actix Web - New form message with post method:</h1>
+
+    <form id="messageForm">
+        <label for="title">Message Title:</label>
+        <input type="text" id="title" name="title" required><br>
+
+        <label for="content">Message Content:</label>
+        <textarea id="content" name="content" required></textarea><br>
+
+        <label for="formTitle">Form Title:</label>
+        <input type="text" id="formTitle" name="formTitle" required><br>
+
+        <button type="submit">Create Message</button>
     </form>
-    
-    <p>Dynamic content: <span id="dynamic-content">Loading...</span></p>
-    
+
+    <h1>Actix Web - Old messages with get method:</h1>
+    <div id="messageList">
+        <h2>Messages:</h2>
+        <ul id="messages"></ul>
+    </div>
+
     <script>
-        const form = document.querySelector('form'); // Select the form element on the page
+        async function createMessage() {
+    const url = 'http://wulvahiv5zqfrgqo3ceavahsfakxjvp2oqe53sihlq2cuqhzqmea6yqd.onion/api/messages/';
 
-form.addEventListener('submit', async (e) => {
-    e.preventDefault(); // Prevent the page from being reloaded when the form is submitted
-
-    const nameInput = document.getElementById('name');
-    const dynamicContent = document.getElementById('dynamic-content');
-
-    const name = nameInput.value; // Get the name entered by the user
+    const messageData = {
+        title: document.getElementById('title').value,
+        content: document.getElementById('content').value,
+        form_title: document.getElementById('formTitle').value,
+    };
 
     try {
-        // Make a GET request to the `/api/hello/{name}` endpoint
-        const response = await fetch(`/api/hello/${name}`);
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(messageData),
+        });
 
         if (response.ok) {
-            // If the request is successful, get the response as text
-            const data = await response.text();
-            dynamicContent.textContent = data; // Display the response on the page
+            const responseData = await response.json();
+            console.log('Success:', responseData);
+            fetchMessages(); // Fetch messages after creating a new one
         } else {
-            // If the request is unsuccessful, display an error message
-            dynamicContent.textContent = 'Error: ' + response.status;
+            const errorData = await response.json();
+            console.error('Error:', errorData);
         }
     } catch (error) {
-        console.error('Error:', error);
-        dynamicContent.textContent = 'An error occurred.';
+        console.error('Fetch error:', error);
     }
-});
+}
 
+
+        // Function to fetch and display messages
+        async function fetchMessages() {
+            const url = 'http://wulvahiv5zqfrgqo3ceavahsfakxjvp2oqe53sihlq2cuqhzqmea6yqd.onion/api/messages';
+
+            try {
+                const response = await fetch(url);
+                const responseData = await response.json();
+
+                if (response.ok) {
+                    const messagesContainer = document.getElementById('messages');
+                    messagesContainer.innerHTML = ''; // Clear previous messages
+
+                    responseData.messages.forEach((message) => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `${message.title}: ${message.content} (${message.form_title})`;
+                        messagesContainer.appendChild(listItem);
+                    });
+                } else {
+                    console.error('Error:', responseData);
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+            }
+        }
+
+        // Fetch messages when the page loads
+        window.onload = fetchMessages;
+
+        // Event listener for the message form
+        document.getElementById('messageForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            createMessage();
+            fetchMessages(); // Fetch messages after creating a new one
+        });
     </script>
 </body>
 </html>

@@ -2,11 +2,11 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize, sqlx::FromRow)]
 #[allow(non_snake_case)]
-pub struct NoteModel {
+pub struct FormMessageModel {
     pub id: String,
     pub title: String,
     pub content: String,
-    pub category: Option<String>,
+    pub form_title: Option<String>,
     pub published: i8,
     pub created_at: Option<chrono::DateTime<chrono::Utc>>,
     pub updated_at: Option<chrono::DateTime<chrono::Utc>>,
@@ -14,11 +14,11 @@ pub struct NoteModel {
 
 #[derive(Debug, Deserialize, Serialize)]
 #[allow(non_snake_case)]
-pub struct NoteModelResponse {
+pub struct FormMessageModelResponse {
     pub id: String,
     pub title: String,
     pub content: String,
-    pub category: String,
+    pub form_title: String,
     pub published: bool,
     pub createdAt: chrono::DateTime<chrono::Utc>,
     pub updatedAt: chrono::DateTime<chrono::Utc>,
@@ -39,4 +39,3 @@ pub struct UserModelResponse {
     pub username: String,
     pub password: String,
 }
-

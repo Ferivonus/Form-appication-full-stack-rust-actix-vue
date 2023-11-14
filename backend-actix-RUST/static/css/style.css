@@ -1,5 +1,4 @@
 /* Apply some basic styling to the form and its elements */
-
 form {
     max-width: 300px;
     margin: 0 auto;
@@ -13,14 +12,18 @@ form {
 
 label {
     font-weight: bold;
+    display: block;
+    margin-bottom: 8px;
 }
 
+textarea,
 input[type="text"] {
     width: 100%;
     padding: 10px;
-    margin: 5px 0;
+    margin: 5px 0 15px;
     border: 1px solid #ccc;
     border-radius: 3px;
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
 }
 
 button[type="submit"] {
@@ -31,6 +34,7 @@ button[type="submit"] {
     padding: 10px 20px;
     cursor: pointer;
     font-weight: bold;
+    transition: background-color 0.3s; /* Add a smooth transition effect */
 }
 
 button[type="submit"]:hover {
@@ -38,7 +42,6 @@ button[type="submit"]:hover {
 }
 
 /* Apply some styling to the dynamic content section */
-
 #dynamic-content {
     margin: 20px 0;
     font-size: 18px;

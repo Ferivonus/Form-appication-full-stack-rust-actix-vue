@@ -44,7 +44,7 @@ async fn main() -> std::io::Result<()> {
     };
 
 
-    println!("🚀 handlebars started successfully");
+    println!("🚀 ractix back-end system started successfully");
 
 
     let mut handlebars = Handlebars::new();
@@ -56,7 +56,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
 
         let cors = Cors::default()
-            .allowed_origin("http://localhost:3000")
+            .allowed_origin("http://wulvahiv5zqfrgqo3ceavahsfakxjvp2oqe53sihlq2cuqhzqmea6yqd.onion")
             .allowed_methods(vec!["GET", "POST", "PATCH", "DELETE"])
             .allowed_headers(vec![
                 header::CONTENT_TYPE,
@@ -64,8 +64,6 @@ async fn main() -> std::io::Result<()> {
                 header::ACCEPT,
             ])
             .supports_credentials();
-
-            println!("🚀 handlebars started successfully");
 
         App::new()
             .app_data(handlebars_ref.clone())
