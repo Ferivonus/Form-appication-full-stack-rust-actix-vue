@@ -1,75 +1,31 @@
+<!-- index.html -->
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>My Actix Web Page</title>
-    <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forum Pages</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/index.css">
 </head>
 <body>
+    <h1>Welcome to Forum Pages</h1>
 
-<h2>Sakın basma:</h2>
-    <iframe width="110" height="200" src="https://www.myinstants.com/instant/aykut-elmas-hos-geldiniz-45207/embed/" frameborder="0" scrolling="no"></iframe>
+    <h2>Explore Our Forum Pages</h2>
+    <ul>
+        <li><a href="form/chatting">Chatting Forum</a></li>
+        <li><a href="form/astrology">Astrology Forum</a></li>
+        <li><a href="form/game">Game Forum</a></li>
+        <li><a href="form/sport">Sport Forum</a></li>
+        <li><a href="form/software">Software Forum</a></li>
+    </ul>
 
-
-    <h1>Hello, Actix Web!!</h1>
-    <p>Welcome to my Actix web page. This is a sample HTML page.</p>
-    <h1>Actix Web - New form message with post method:</h1>
-    <a href=""></a>
-
-    <form id="messageForm">
-        <label for="title">New Form Title:</label>
-        <input type="text" id="title" name="title" required><br>
-
-        <label for="content">Form title's content:</label>
-        <textarea id="content" name="content" required></textarea><br>
-
-        <label for="formTitle">Form Title :</label>
-        <input type="text" id="formTitle" name="formTitle" required><br>
-
-        <button type="submit">Create Form post title</button>
-    </form>
-
-    <h1>Actix Web - Old messages with get method:</h1>
-    <div id="messageList">
-        <h2>Messages:</h2>
-        <ul id="messages"></ul>
-    </div>
+    <h2>Latest Messages from All Forums</h2>
+    <ul id="allMessages"></ul>
 
     <script>
-        async function createMessage() {
-    const url = 'http://localhost:8080/api/messages/';
-
-    const messageData = {
-        title: document.getElementById('title').value,
-        content: document.getElementById('content').value,
-        form_title: document.getElementById('formTitle').value,
-        published: true,
-    };
-
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(messageData),
-        });
-
-        if (response.ok) {
-            const responseData = await response.json();
-            console.log('Success:', responseData);
-            fetchMessages(); // Fetch messages after creating a new one
-        } else {
-            const errorData = await response.json();
-            console.error('Error:', errorData);
-        }
-    } catch (error) {
-        console.error('Fetch error:', error);
-    }
-}
-
-
-        // Function to fetch and display messages
-        async function fetchMessages() {
+        // Fetch and display all messages
+        async function fetchAndDisplayAllMessages() {
             const url = 'http://localhost:8080/api/messages';
 
             try {
@@ -77,12 +33,12 @@
                 const responseData = await response.json();
 
                 if (response.ok) {
-                    const messagesContainer = document.getElementById('messages');
+                    const messagesContainer = document.getElementById('allMessages');
                     messagesContainer.innerHTML = ''; // Clear previous messages
 
                     responseData.messages.forEach((message) => {
                         const listItem = document.createElement('li');
-                        listItem.textContent = `${message.title}: ${message.content} (${message.form_title})`;
+                        listItem.textContent = `${message.title}: ${message.content}`;
                         messagesContainer.appendChild(listItem);
                     });
                 } else {
@@ -93,15 +49,8 @@
             }
         }
 
-        // Fetch messages when the page loads
-        window.onload = fetchMessages;
-
-        // Event listener for the message form
-        document.getElementById('messageForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            createMessage();
-            fetchMessages(); // Fetch messages after creating a new one
-        });
+        // Fetch all messages when the page loads
+        window.onload = fetchAndDisplayAllMessages;
     </script>
 </body>
 </html>
