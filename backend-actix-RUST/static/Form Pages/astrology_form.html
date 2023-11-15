@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Astroloji Forum</title>
+</head>
+<body>
+    <h1>Astroloji Forum</h1>
+    
+    <p>Hoş geldiniz! Bu astroloji forumuna hoş geldiniz.</p>
+
+    <form id="messageForm">
+        <label for="title">New Form Title:</label>
+        <input type="text" id="title" name="title" required><br>
+
+        <label for="content">Form title's content:</label>
+        <textarea id="content" name="content" required></textarea><br>
+
+        <button type="submit">Create Form post title</button>
+    </form>
+
+    <h2>eski mesajlar:</h2>
+
+    <ul id="formMessages"></ul>
+
+    <script>
+        async function createMessage() {
+            const url = 'http://localhost:8080/api/messages/';
+
+            const messageData = {
+                title: document.getElementById('title').value,
+                content: document.getElementById('content').value,
+                form_title: "astrology",
+                published: true,
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(messageData),
+                });
+
+                if (response.ok) {
+                    const responseData = await response.json();
+                    console.log('Success:', responseData);
+                    fetchAndDisplayMessages('astrology');  // Fetch messages after creating a new one
+                } else {
+                    const errorData = await response.json();
+                    console.error('Error:', errorData);
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+            }
+        }
+
+        // Fetch messages for the "astrology" form
+        async function fetchAndDisplayMessages(formName) {
+            const url = `http://localhost:8080/api/messages/${formName}`;
+
+            try {
+                const response = await fetch(url);
+                const responseData = await response.json();
+
+                if (response.ok) {
+                    const messagesContainer = document.getElementById('formMessages');
+                    messagesContainer.innerHTML = ''; // Clear previous messages
+
+                    responseData.messages.forEach((message) => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `${message.title}: ${message.content}`;
+                        messagesContainer.appendChild(listItem);
+                    });
+                } else {
+                    console.error('Error:', responseData);
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+            }
+        }
+
+        // Fetch messages when the page loads
+        window.onload = () => fetchAndDisplayMessages('astrology');
+
+        // Event listener for the message form
+        document.getElementById('messageForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            createMessage('astrology');
+        });
+    </script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 // main.rs:
 use actix_files::NamedFile;
-use actix_web::{http::header, web, App, HttpServer, HttpRequest, HttpResponse};
+use actix_web::{http::header, web, App, HttpServer, HttpRequest};
 use handlebars::Handlebars;
 
 use actix_cors::Cors;
@@ -71,21 +71,22 @@ async fn main() -> std::io::Result<()> {
             .configure(handler::config)
             .wrap(cors)
             .wrap(Logger::default())
-            .route("/", web::get().to(|| async { HttpResponse::Ok().body("Home Page") }))
             .route("/bookpage", web::get().to(links::book_page))
+            .route("/", web::get().to(|_req: HttpRequest| async {
+                let file = NamedFile::open("static/index.html");
+                match file {
+                    Ok(file) => Ok(file),
+                    Err(err) => Err(actix_web::error::ErrorInternalServerError(err)),
+                }
+            }))
             .service(
-                web::resource("/index.html")
-                    .route(web::get().to(|_req: HttpRequest| async {
-                        let file = NamedFile::open("static/index.html");
-                        match file {
-                            Ok(file) => Ok(file),
-                            Err(err) => Err(actix_web::error::ErrorInternalServerError(err)),
-                        }
-                    }),
-                ))
+                web::resource("/form/{form_link}")
+                    .route(web::get().to(links::serve_form_page)),
+            )
             .service(
                 actix_files::Files::new("/static", "static").show_files_listing()
             )
+            
     })
     .bind("127.0.0.1:8080")?
     // .bind("127.0.0.1:80")? masal için tor (These lines are commented out)

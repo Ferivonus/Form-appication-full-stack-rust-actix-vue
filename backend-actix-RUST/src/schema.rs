@@ -7,6 +7,13 @@ pub struct FilterOptions {
 }
 
 #[derive(Deserialize, Debug)]
+pub struct FilterOnFormOptions {
+    pub page: Option<usize>,
+    pub limit: Option<usize>,
+    pub form_title: Option<String>,
+}
+
+#[derive(Deserialize, Debug)]
 pub struct ParamOptions {
     pub id: String,
 }
