@@ -10,15 +10,12 @@ pub async fn serve_form_page(req: HttpRequest) -> actix_web::Result<actix_files:
     // Extract the Form name from the request path
     let form_name = req.match_info().query("form_link");
 
-    println!("I am trying to find: {}",form_name);
     let form_file_path = "static/Form Pages/";
-    println!("I declare path ");
     // Manually specify the allowed Form names
     let allowed_form_names = ["chatting","astrology", "game", "sport", "software"];
 
     // Check if the requested form name is allowed
     if allowed_form_names.contains(&form_name) {
-        println!("I tried to find page");
         // Construct the file path by appending the form name and ".html" to the "form Pages" directory
         let path = format!("{}{}_form.html",form_file_path, form_name);
 
