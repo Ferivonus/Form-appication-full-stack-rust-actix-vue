@@ -1,7 +1,7 @@
 // src/handlers.rs: 
 use crate::{
     model::{FormMessageModel, FormMessageModelResponse, UserModel, UserModelResponse},
-    schema::{CreateMessageSchema, FilterOptions, FilterOnFormOptions, UpdateMessageSchema },
+    schema::{CreateMessageSchema, FilterAllMessagesOptions, FilterOnFormOptions, UpdateMessageSchema },
     AppState,
 };
 
@@ -17,7 +17,7 @@ async fn form_checker_handler() -> impl Responder {
 
 #[get("/messages")]
 pub async fn full_form_message_list_handler(
-    opts: web::Query<FilterOptions>,
+    opts: web::Query<FilterAllMessagesOptions>,
     data: web::Data<AppState>,
 ) -> impl Responder {
     let limit = opts.limit.unwrap_or(10);
@@ -48,7 +48,7 @@ pub async fn full_form_message_list_handler(
 
 
 #[get("/messages/{form_name}")]
-pub async fn full_form_message_list_by_form_name_handler(
+pub async fn form_message_list_by_form_name_handler(
     opts: web::Query<FilterOnFormOptions>,
     data: web::Data<AppState>,
     path: web::Path<(String,)>,
@@ -70,7 +70,7 @@ pub async fn full_form_message_list_by_form_name_handler(
 
     let messages: Vec<FormMessageModel> = sqlx::query_as!(
         FormMessageModel,
-        r#"SELECT * FROM form_messages WHERE form_title = ? ORDER by id LIMIT ? OFFSET ?"#,
+        r#"SELECT * FROM form_messages WHERE form_title = ? AND published = true ORDER by id LIMIT ? OFFSET ?"#,
         form_name,
         limit as i32,
         offset as i32
@@ -160,7 +160,7 @@ pub fn config(conf: &mut web::ServiceConfig) {
         .service(form_checker_handler)
         .service(full_form_message_list_handler)
         .service(create_message_handler)
-        .service(full_form_message_list_by_form_name_handler);
+        .service(form_message_list_by_form_name_handler);
 
     conf.service(scope);
 }
