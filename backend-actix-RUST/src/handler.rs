@@ -53,16 +53,16 @@ pub async fn form_message_list_by_form_name_handler(
     data: web::Data<AppState>,
     path: web::Path<(String,)>,
 ) -> impl Responder {
-    let form_name = path.0.clone();
+    let form_name_of_link = path.0.clone();
     let limit = opts.limit.unwrap_or(10);
     let offset = (opts.page.unwrap_or(1) - 1) * limit;
 
-    // If form_title is present and not equal to form_name, return a bad request
+    // If form_title is present and not equal to form_name_of_link, return a bad request
     if let Some(ref form_title) = opts.form_title {
-        if form_name != *form_title {
+        if form_name_of_link != *form_title {
             return HttpResponse::BadRequest().json(json!({
                 "status": "fail",
-                "message": "form_name and form_title must be the same"
+                "message": "form_name_of_link and form_title must be the same"
             }));
         }
     }
@@ -71,7 +71,7 @@ pub async fn form_message_list_by_form_name_handler(
     let messages: Vec<FormMessageModel> = sqlx::query_as!(
         FormMessageModel,
         r#"SELECT * FROM form_messages WHERE form_title = ? AND published = true ORDER by id LIMIT ? OFFSET ?"#,
-        form_name,
+        form_name_of_link,
         limit as i32,
         offset as i32
     )
@@ -119,8 +119,6 @@ async fn create_message_handler(
         return HttpResponse::InternalServerError()
             .json(serde_json::json!({"status": "error","form_message": format!("{:?}", err)}));
     }
-
-    println!("🚀 messages part worked without id");
 
     let query_result = sqlx::query_as!(FormMessageModel, r#"SELECT * FROM form_messages WHERE id = ?"#, user_id)
         .fetch_one(&data.db)

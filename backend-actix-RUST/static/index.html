@@ -1,5 +1,3 @@
-<!-- index.html -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,50 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forum Pages</title>
     <link rel="stylesheet" type="text/css" href="/static/css/index.css">
+    <script src="/static/javascript/formMessageApi.js"></script>
+
 </head>
 <body>
-    <h1>Welcome to Forum Pages</h1>
+    <header>
+        <h1>Welcome to Forum Pages</h1>
+        <p>Explore different forums and engage in discussions with fellow enthusiasts.</p>
+    </header>
 
-    <h2>Explore Our Forum Pages</h2>
-    <ul>
-        <li><a href="form/chatting">Chatting Forum</a></li>
-        <li><a href="form/astrology">Astrology Forum</a></li>
-        <li><a href="form/game">Game Forum</a></li>
-        <li><a href="form/sport">Sport Forum</a></li>
-        <li><a href="form/software">Software Forum</a></li>
-    </ul>
+    <nav>
+        <h2>Explore Our Forum Pages</h2>
+        <ul>
+            <li><a href="form/chatting">Chatting Forum</a></li>
+            <li><a href="form/astrology">Astrology Forum</a></li>
+            <li><a href="form/game">Game Forum</a></li>
+            <li><a href="form/sport">Sport Forum</a></li>
+            <li><a href="form/software">Software Forum</a></li>
+        </ul>
+    </nav>
 
-    <h2>Latest Messages from All Forums</h2>
-    <ul id="allMessages"></ul>
+    <section>
+        <h2>Latest Messages from All Forums</h2>
+        <ul id="MessagesList"></ul>
+    </section>
 
+    <footer>
+        <p>&copy; 2023 Forum Pages</p>
+    </footer>
     <script>
-        // Fetch and display all messages
-        async function fetchAndDisplayAllMessages() {
-            const url = 'http://localhost:8080/api/messages';
-
-            try {
-                const response = await fetch(url);
-                const responseData = await response.json();
-
-                if (response.ok) {
-                    const messagesContainer = document.getElementById('allMessages');
-                    messagesContainer.innerHTML = ''; // Clear previous messages
-
-                    responseData.messages.forEach((message) => {
-                        const listItem = document.createElement('li');
-                        listItem.textContent = `${message.title}: ${message.content}`;
-                        messagesContainer.appendChild(listItem);
-                    });
-                } else {
-                    console.error('Error:', responseData);
-                }
-            } catch (error) {
-                console.error('Fetch error:', error);
-            }
-        }
 
         // Fetch all messages when the page loads
-        window.onload =() => fetchAndDisplayAllMessages();
+        window.onload = () => {
+            fetchAndDisplayAllMessages();
+            // Add other necessary initialization code here
+        };
         
     </script>
 </body>

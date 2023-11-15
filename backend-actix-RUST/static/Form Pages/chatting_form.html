@@ -4,14 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="/static/css/formbasic.css">
+    <script src="/static/javascript/formMessageApi.js"></script>
 
     <title>Document</title>
 </head>
 <body>
 
-    <p>Sakın basma:</p>
-    <iframe width="110" height="200" src="https://www.myinstants.com/instant/aykut-elmas-hos-geldiniz-45207/embed/" frameborder="0" scrolling="no"></iframe>
 
+    <header>
+        <h1>chatting Form</h1>
+        <p>Hoş geldiniz! Bu chatting forumuna hoş geldiniz.</p>
+    </header>
+
+    <main>
+        <form id="messageForm">
+            <label for="title">New Form Title:</label>
+            <input type="text" id="title" name="title" required><br>
+    
+            <label for="content">Form title's content:</label>
+            <textarea id="content" name="content" required></textarea><br>
+    
+            <button type="submit">Create Form post title</button>
+        </form>
+
+
+    </main>
+
+        <h2>Form messages</h2>
+
+    <div class="message-container" id="formMessages">
+        <!-- Messages will be dynamically added here -->
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2023 chatting Form</p>
+    </div>
+
+    <script>
+        // Fetch messages when the page loads
+        window.onload = () => fetchAndDisplayMessages('chatting');
+
+        // Event listener for the message form
+        document.getElementById('messageForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            AddFormTitleMessage('chatting');
+        });
+
+        //<p>Sakın basma:</p>
+        //<iframe width="110" height="200" src="https://www.myinstants.com/instant/aykut-elmas-hos-geldiniz-45207/embed/" frameborder="0" scrolling="no"></iframe>
+
+    </script>
     
 </body>
 </html>

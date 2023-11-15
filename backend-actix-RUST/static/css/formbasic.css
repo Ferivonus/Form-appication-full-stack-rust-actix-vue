@@ -1,25 +1,45 @@
+/* Reset box model and set default styles */
+* {
+    margin: 0;
+    padding: 0;
+}
+
+/* Body styles */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
     color: #333;
-    margin: 20px;
+    background-color: #f8f8f8;
 }
 
-h1 {
-    color: #2c3e50;
+/* Header styles */
+header {
+    background-color: #3498db;
+    color: white;
+    text-align: center;
+    padding: 40px;
+    background-image: url('path/to/your/image.jpg');
+    background-size: cover;
 }
 
-p {
-    color: #7f8c8d;
+/* Main content styles */
+main {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Form styles */
 form {
     margin-top: 20px;
 }
 
 label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
     color: #34495e;
 }
 
@@ -34,32 +54,83 @@ textarea {
 }
 
 button {
-    background-color: #3498db;
+    background-color: #2980b9;
     color: #fff;
     padding: 12px 20px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
 }
 
 button:hover {
-    background-color: #2980b9;
+    background-color: #3498db;
+    transform: scale(1.05);
 }
 
-ul {
+/* Message container styles */
+.message-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+}
+
+.message-container li{
     list-style-type: none;
-    padding: 0;
 }
-
-li {
-    margin-bottom: 15px;
+/* Message styles */
+li article.message {
+    width: 100%;
+    margin-bottom: 20px;
+    background-color: #fff;
     border: 1px solid #ecf0f1;
-    padding: 15px;
-    background-color: #ecf0f1;
-    border-radius: 4px;
-    transition: background-color 0.3s;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
 }
 
-li:hover {
-    background-color: #d4e6f1;
+li article.message:hover {
+    transform: scale(1.02);
+}
+
+li h4.message-title {
+    color: #3498db;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+li p.message-content {
+    color: #333;
+    margin-bottom: 15px;
+}
+
+li div.message-details {
+    color: #7f8c8d;
+}
+
+li .message-details em {
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* Additional styles for specific details */
+li em.message-author {
+    color: #e74c3c; /* Author name color */
+}
+
+li em.message-visibility {
+    color: #27ae60; /* Visibility status color */
+}
+
+li em.message-date {
+    color: #f39c12; /* Date color */
+}
+
+/* Footer styles */
+.footer {
+    padding: 20px;
+    text-align: center;
+    background: #ddd;
 }
