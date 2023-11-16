@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="/static/css/formbasic.css">
+    <script src="/static/javascript/formMessageApi.js"></script>
+
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -55,106 +57,5 @@
         <li><a href="/form/sport">Sport Forum</a></li>
         <li><a href="/form/software">Software Forum</a></li>
     </ul>
-
-    <h1>User API Example</h1>
-    
-<form id="loginForm">
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" required>
-
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required>
-
-    <button type="button" onclick="findUserByUsernameAndPassword()">Find user</button>
-</form>
-
-<div id="userList"></div>
-
-
-
-<h2>User Registration Form</h2>
-
-<form id="userForm">
-    <label for="Registerusername">Username:</label>
-    <input type="text" id="Registerusername" name="Registerusername" required><br>
-
-    <label for="Registeremail">Email:</label>
-    <input type="email" id="Registeremail" name="Registeremail" required><br>
-
-    <label for="Registerpassword">Password:</label>
-    <input type="password" id="Registerpassword" name="Registerpassword" required><br>
-
-    <button type="button" onclick="registerUser()">Register</button>
-</form>
-
-<script>
-    async function findUserByUsernameAndPassword() {
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-
-    // http://localhost:8080/api/users/check?username=john_doe&password=hashed_password_123
-    const url = `http://localhost:8080/api/users/check?username=${username}&password=${password}`;
-
-    try {
-        const response = await fetch(url, {
-            method: 'GET',
-        });
-
-        const data = await response.json();
-
-        if (data.status === 'success') {
-            const userListDiv = document.getElementById('userList');
-            userListDiv.innerHTML = `<h2>Users (${data.results} found)</h2>`;
-
-            data.users.forEach(user => {
-                const userElement = document.createElement('div');
-                userElement.innerHTML = `
-                    <p>ID: ${user.id}</p>
-                    <p>Username: ${user.username}</p>
-                    <p>Email: ${user.email}</p>
-                    <p>Registration Date: ${user.registration_date || 'N/A'}</p>
-                    <hr>
-                `;
-                userListDiv.appendChild(userElement);
-            });
-        } else {
-            console.error('Error:', data.message);
-        }
-    } catch (error) {
-        console.error('Fetch error:', error);
-    }
-}
-
-function registerUser() {
-
-    const apiUrl = 'http://localhost:8080/api/users'; // Replace with the actual URL where your Rust API is running
-
-    const user = {
-        username: document.getElementById('Registerusername').value,
-        password: document.getElementById('Registerpassword').value,
-        email: document.getElementById('Registeremail').value,
-    }
-
-    const requestOptions = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(user),
-    };
-
-    fetch(`${apiUrl}/add/`, requestOptions)
-        .then(response => response.json())
-        .then(data => {
-            console.log('Response:', data);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-
-    }
-
-</script>
-
 </body>
 </html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="/static/css/formbasic.css">
+    <script src="/static/javascript/formMessageApi.js"></script>
+    
+    <title>User login page</title>
+
+    <style>
+
+    </style>
+
+</head>
+<body>
+
+    <h2>Find user by Username and Password:</h2>
+    <form id="loginForm">
+        <label for="username-login">Username:</label>
+        <input type="text" id="username-login" name="username-login" required>
+    
+        <label for="password-login">Password:</label>
+        <input type="password" id="password-login" name="password-login" required>
+    
+        <button type="button" onclick="findUserByUsernameAndPassword()">Find user</button>
+    </form>
+    
+    <div id="userList-usernameAndPassword"></div>
+
+    <h2>Find user by mail and Password:</h2>
+
+    <form id="loginForm">
+        <label for="mail-login">Mail:</label>
+        <input type="text" id="mail-login" name="mail-login" required>
+    
+        <label for="password-login-with-mail">Password:</label>
+        <input type="password" id="password-login-with-mail" name="password-login-with-mail" required>
+    
+        <button type="button" onclick="findUserByMailAndPassword()">Find user</button>
+    </form>
+    
+    <div id="userList-MailAndPassword"></div>
+
+</body>
+</html>

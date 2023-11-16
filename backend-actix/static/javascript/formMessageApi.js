@@ -103,3 +103,92 @@ async function fetchAndDisplayAllMessages() {
         console.error('Fetch error:', error);
     }
 }
+
+
+async function findUserByUsernameAndPassword() {
+
+    const user ={
+        username: document.getElementById('username-login').value,
+        password: password = document.getElementById('password-login').value,
+    }
+
+    // http://localhost:8080/api/users/check?username=john_doe&password=hashed_password_123
+    const url = `http://localhost:8080/api/user/info/by_username`;
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(user),
+        });
+
+        const data = await response.json();
+
+        if (data.status === 'success') {
+            const userListDiv = document.getElementById('userList-usernameAndPassword');
+            userListDiv.innerHTML = `<h2>Users (${data.results} found)</h2>`;
+
+            data.users.forEach(user => {
+                const userElement = document.createElement('div');
+                userElement.innerHTML = `
+                    <p>ID: ${user.id}</p>
+                    <p>Username: ${user.username}</p>
+                    <p>Email: ${user.email}</p>
+                    <p>Registration Date: ${user.registration_date || 'N/A'}</p>
+                    <hr>
+                `;
+                userListDiv.appendChild(userElement);
+            });
+        } else {
+            console.error('Error:', data.message);
+        }
+    } catch (error) {
+        console.error('Fetch error:', error);
+    }
+}
+
+async function findUserByMailAndPassword() {
+
+    const user ={
+        email: document.getElementById('mail-login').value,
+        password: document.getElementById('password-login-with-mail').value,
+    }
+
+    // http://localhost:8080/api/users/check?username=john_doe&password=hashed_password_123
+    const url = `http://localhost:8080/api/user/info/by_email`;
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(user),
+        });
+
+        const data = await response.json();
+
+        if (data.status === 'success') {
+            const userListDiv = document.getElementById('userList-MailAndPassword');
+            userListDiv.innerHTML = `<h2>Users (${data.results} found)</h2>`;
+
+            data.users.forEach(user => {
+                const userElement = document.createElement('div');
+                userElement.innerHTML = `
+                    <p>ID: ${user.id}</p>
+                    <p>Username: ${user.username}</p>
+                    <p>Email: ${user.email}</p>
+                    <p>Registration Date: ${user.registration_date || 'N/A'}</p>
+                    <hr>
+                `;
+                userListDiv.appendChild(userElement);
+            });
+        } else {
+            console.error('Error:', data.message);
+        }
+    } catch (error) {
+        console.error('Fetch error:', error);
+    }
+}

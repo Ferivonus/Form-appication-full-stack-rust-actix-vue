@@ -1,32 +1,26 @@
 
 // src/handlers.rs: 
 use crate::{
-    model::{FormMessageModel, FormMessageModelResponse, UserModel, UserModelResponse,UserAddRequestModel,AuthUserRequestModel},
-    schema::{CreateMessageSchema, FilterAllMessagesOptions, FilterOnFormOptions },
+    model::{FormMessageModel, FormMessageModelResponse, UserModel, UserModelResponse,UserAddRequestModel,AuthUserRequestModelUsername,AuthUserRequestModelMail},
+    schema::{CreateMessageSchema, FilterAllMessagesOptions, FilterOnFormOptions},
     AppState,
 };
 
-
-
-use actix_web::body::BoxBody;
-use serde::{Deserialize};
-use crate::HttpRequest;
-use crate::header::ContentType;
-
+use serde::Deserialize;
+use chrono::{ Utc, TimeZone};
 
 use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 use serde_json::json;
-use serde::{Serialize};
 
-#[get("/api_info")]
-async fn form_checker_handler() -> impl Responder {
+#[get("/live")]
+async fn form_live_checker_handler() -> impl Responder {
     const MESSAGE: &str = "Form system CRUD API with Rust, SQLX, MySQL, and Actix Web";
 
     HttpResponse::Ok().json(json!({"status": "success","form_message": MESSAGE}))
 }
 
 #[get("/messages")]
-pub async fn full_form_message_list_handler(
+pub async fn every_message_handler(
     opts: web::Query<FilterAllMessagesOptions>,
     data: web::Data<AppState>,
 ) -> impl Responder {
@@ -103,7 +97,7 @@ pub async fn form_message_list_by_form_name_handler(
 }
 
 #[post("/messages/")]
-async fn create_message_handler(
+async fn add_message_handler(
     body: web::Json<CreateMessageSchema>,
     data: web::Data<AppState>,
 ) -> impl Responder {
@@ -162,74 +156,11 @@ fn filter_db_record(form_message: &FormMessageModel) -> FormMessageModelResponse
     }
 }
 
+//Users api:
 
-//Users:
-
-
-#[get("/users/check/{username_fromuser}/{password_fromuser}")]
-pub async fn two_line_get_users(
-    path: web::Path<(String, String)>,
-    data: web::Data<AppState>,
-) -> impl Responder {
-    let (username_fromuser, password_fromuser) = path.into_inner();
-
-    println!("Username: {}", username_fromuser);
-    println!("Password: {}", password_fromuser);
-
-
-    //hash functions:
-    let password_hash = password_fromuser;
-
-
-    let users: Result<Vec<UserModel>, sqlx::Error> = sqlx::query_as!(
-        UserModel,
-        "SELECT * FROM users WHERE username = ? AND password_hash = ?",
-        username_fromuser,
-        password_hash
-    )
-    .fetch_all(&data.db)
-    .await;
-
-    match users {
-        Ok(users) => {
-            let user_responses = users
-                .into_iter()
-                .map(|user| {
-                    // Convert Option<chrono::DateTime<Utc>> to Option<String>
-                    let registration_date = user.registration_date.unwrap();
-                    
-                    UserModelResponse {
-                        id: user.id,
-                        username: user.username,
-                        email: user.email,
-                        registration_date: Some(registration_date),
-                    }
-                })
-                .collect::<Vec<UserModelResponse>>();
-
-            let json_response = serde_json::json!({
-                "status": "success",
-                "results": user_responses.len(),
-                "users": user_responses
-            });
-
-            HttpResponse::Ok().json(json_response)
-        }
-        Err(err) => {
-            let json_response = serde_json::json!({
-                "status": "error",
-                "message": err.to_string() // Use to_string() method directly
-            });
-
-            HttpResponse::InternalServerError().json(json_response)
-        }
-    }
-}
-
-// example of use: http://localhost:8080/api/users/check?username=john_doe&password=hashed_password_123
-#[get("/users/check")]
-pub async fn one_line_get_users(
-    account: web::Query<AuthUserRequestModel>,
+#[post("/user/info/by_username")]
+pub async fn get_user_by_username(
+    account: web::Json<AuthUserRequestModelUsername>,
     data: web::Data<AppState>,
 ) -> impl Responder {
     // Destructure the info into individual variables
@@ -238,14 +169,14 @@ pub async fn one_line_get_users(
     println!("Username: {}", username);
     println!("Password: {}", password);
 
-    //hash functions:
-    let password_hash = password;
+    // Hash the password using a proper hashing function (e.g., argon2)
+    let password_hash = hash_password(password);
 
     let users: Result<Vec<UserModel>, sqlx::Error> = sqlx::query_as!(
         UserModel,
         "SELECT * FROM users WHERE username = ? AND password_hash = ?",
         username,
-        password_hash
+        &password_hash
     )
     .fetch_all(&data.db)
     .await;
@@ -255,14 +186,17 @@ pub async fn one_line_get_users(
             let user_responses = users
                 .into_iter()
                 .map(|user| {
-                    // Convert Option<chrono::DateTime<Utc>> to Option<String>
-                    let registration_date = user.registration_date.unwrap();
+                    // Convert Option<chrono::DateTime<Utc>> to String
+                    let registration_date_string = user
+                        .registration_date
+                        .map(|date| Utc.from_utc_datetime(&date.naive_utc()).format("%Y-%m-%d %H:%M:%S").to_string())
+                        .unwrap_or_default();
 
                     UserModelResponse {
                         id: user.id,
                         username: user.username,
                         email: user.email,
-                        registration_date: Some(registration_date),
+                        registration_date: Some(registration_date_string), // Use String here
                     }
                 })
                 .collect::<Vec<UserModelResponse>>();
@@ -278,7 +212,7 @@ pub async fn one_line_get_users(
         Err(err) => {
             let json_response = serde_json::json!({
                 "status": "error",
-                "message": err.to_string() // Use to_string() method directly
+                "message": err.to_string()
             });
 
             HttpResponse::InternalServerError().json(json_response)
@@ -286,21 +220,86 @@ pub async fn one_line_get_users(
     }
 }
 
-#[derive(Debug, Deserialize ,Serialize)]
-pub struct UserOperation {
-    pub operation: String,
-    pub result: bool,
+#[post("/user/info/by_email")]
+pub async fn get_user_by_email(
+    account: web::Json<AuthUserRequestModelMail>,
+    data: web::Data<AppState>,
+) -> impl Responder {
+    // Destructure the info into individual variables
+    let email = &account.email;
+    let password = &account.password;
+    println!("Email:    {}", email);
+    println!("Password: {}", password);
+
+    // Hash the password using a proper hashing function (e.g., argon2)
+    let password_hash = hash_password(password);
+
+    let users: Result<Vec<UserModel>, sqlx::Error> = sqlx::query_as!(
+        UserModel,
+        "SELECT * FROM users WHERE email = ? AND password_hash = ?",
+        email,
+        &password_hash
+    )
+    .fetch_all(&data.db)
+    .await;
+
+    match users {
+        Ok(users) => {
+            let user_responses = users
+                .into_iter()
+                .map(|user| {
+                    // Convert Option<chrono::DateTime<Utc>> to String
+                    let registration_date_string = user
+                        .registration_date
+                        .map(|date| Utc.from_utc_datetime(&date.naive_utc()).format("%Y-%m-%d %H:%M:%S").to_string())
+                        .unwrap_or_default();
+
+                    UserModelResponse {
+                        id: user.id,
+                        username: user.username,
+                        email: user.email,
+                        registration_date: Some(registration_date_string),
+                    }
+                })
+                .collect::<Vec<UserModelResponse>>();
+
+            let json_response = serde_json::json!({
+                "status": "success",
+                "results": user_responses.len(),
+                "users": user_responses
+            });
+
+            HttpResponse::Ok().json(json_response)
+        }
+        Err(err) => {
+            let json_response = serde_json::json!({
+                "status": "error",
+                "message": err.to_string()
+            });
+
+            HttpResponse::InternalServerError().json(json_response)
+        }
+    }
 }
 
-#[post("/users/add/")]
+
+// Helper function to hash the password using a secure hash function
+fn hash_password(password: &str) -> String {
+    // Implement your password hashing logic here, for example using argon2
+    // This is a placeholder, you should use a proper password hashing library
+    // Don't forget to handle errors appropriately
+    format!("{}", password)
+}
+
+#[post("/user/add/")]
 pub async fn add_user(
     new_account: web::Json<UserAddRequestModel>,
     data: web::Data<AppState>,
 ) -> impl Responder {
 
+    let email = &new_account.email;
     let username = &new_account.username;
     let password = &new_account.password;
-    let email = &new_account.email;
 
     println!("Username: {}", new_account.username);
     println!("Password: {}", new_account.password);
@@ -410,27 +409,14 @@ pub async fn add_user(
 }
 
 
-
-
-
-pub fn filter_user_record(user: &UserModel) -> UserModelResponse {
-    UserModelResponse {
-        id: user.id,
-        username: user.username.clone(),
-        email: user.email.clone(),
-        registration_date: user.registration_date, // Doğrudan Option<DateTime<Utc>>'ı kullanabilirsiniz
-        // Diğer alanları da buraya ekleyebilirsin.
-    }
-}
-
 pub fn config(conf: &mut web::ServiceConfig) {
     let scope = web::scope("/api")
 
-        .service(form_checker_handler)
-        .service(full_form_message_list_handler)
-        .service(create_message_handler)
-        .service(one_line_get_users)
-        .service(two_line_get_users)
+        .service(form_live_checker_handler)
+        .service(every_message_handler)
+        .service(add_message_handler)
+        .service(get_user_by_username)
+        .service(get_user_by_email)
         .service(add_user)
         .service(form_message_list_by_form_name_handler);
 
@@ -440,7 +426,16 @@ pub fn config(conf: &mut web::ServiceConfig) {
 
 
 
+// web query example:
 
+#[derive(Debug, Deserialize)]
+pub struct Nums {
+    first: u64,
+    second: u64,
+}
 
-
-
+//    /multiply?first=5&second=2 
+#[get("/multiply")]
+pub async fn multiply(nums: web::Query<Nums>) -> impl Responder {
+    format!("Result: {}!", nums.first * nums.second)
+}

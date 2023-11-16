@@ -85,6 +85,10 @@ async fn main() -> std::io::Result<()> {
                     .route(web::get().to(links::serve_form_page)),
             )
             .service(
+                web::resource("/user/{user_link}")
+                    .route(web::get().to(links::serve_user_page)),
+            )
+            .service(
                 actix_files::Files::new("/static", "static").show_files_listing()
             )
     })
