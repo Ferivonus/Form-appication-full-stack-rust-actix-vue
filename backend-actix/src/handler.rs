@@ -291,7 +291,7 @@ fn hash_password(password: &str) -> String {
     format!("{}", password)
 }
 
-#[post("/user/add/")]
+#[post("/user/register/")]
 pub async fn add_user(
     new_account: web::Json<UserAddRequestModel>,
     data: web::Data<AppState>,

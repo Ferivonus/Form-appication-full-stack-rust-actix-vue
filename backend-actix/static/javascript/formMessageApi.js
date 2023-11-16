@@ -192,3 +192,32 @@ async function findUserByMailAndPassword() {
         console.error('Fetch error:', error);
     }
 }
+
+function registerUser() {
+
+    const apiUrl = 'http://localhost:8080/api/user'; // Replace with the actual URL where your Rust API is running
+
+    const user = {
+        username: document.getElementById('Registerusername').value,
+        password: document.getElementById('Registerpassword').value,
+        email: document.getElementById('Registeremail').value,
+    }
+
+    const requestOptions = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(user),
+    };
+
+    fetch(`${apiUrl}/register/`, requestOptions)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Response:', data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+
+    }
