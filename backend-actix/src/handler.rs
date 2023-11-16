@@ -2,7 +2,7 @@
 // src/handlers.rs: 
 use crate::{
     model::{FormMessageModel, FormMessageModelResponse, UserModel, UserModelResponse,UserAddRequestModel,AuthUserRequestModel},
-    schema::{CreateMessageSchema, FilterAllMessagesOptions, FilterOnFormOptions,FilterAllUserOptions },
+    schema::{CreateMessageSchema, FilterAllMessagesOptions, FilterOnFormOptions },
     AppState,
 };
 
