@@ -423,40 +423,6 @@ pub fn filter_user_record(user: &UserModel) -> UserModelResponse {
     }
 }
 
-
-#[derive(Debug, Deserialize)]
-pub struct Nums {
-    first: u64,
-    second: u64,
-}
-
-
-#[derive(Debug, Serialize)]
-struct Operation {
-    operation: String,
-    result: u64,
-}
-
-impl Responder for Operation {
-    type Body = BoxBody;
-
-    fn respond_to(self, _req: &HttpRequest) -> HttpResponse<Self::Body> {
-        let body = serde_json::to_string(&self).unwrap();
-
-        HttpResponse::Ok()
-            .content_type(ContentType::json())
-            .body(body)
-    }
-}
-
-#[post("/add")]
-pub async fn add(nums: web::Json<Nums>) -> impl Responder {
-    Operation {
-        operation: "add".to_string(),
-        result: nums.first + nums.second,
-    }
-}
-
 pub fn config(conf: &mut web::ServiceConfig) {
     let scope = web::scope("/api")
 
@@ -465,7 +431,6 @@ pub fn config(conf: &mut web::ServiceConfig) {
         .service(create_message_handler)
         .service(one_line_get_users)
         .service(two_line_get_users)
-        .service(add)
         .service(add_user)
         .service(form_message_list_by_form_name_handler);
 
