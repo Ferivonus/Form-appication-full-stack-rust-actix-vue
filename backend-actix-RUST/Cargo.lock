@@ -1128,6 +1128,7 @@ dependencies = [
  "dotenv",
  "env_logger",
  "handlebars",
+ "rand",
  "serde",
  "serde_json",
  "sqlx",

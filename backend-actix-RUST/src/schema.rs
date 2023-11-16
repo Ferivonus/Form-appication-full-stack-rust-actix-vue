@@ -7,6 +7,12 @@ pub struct FilterAllMessagesOptions {
 }
 
 #[derive(Deserialize, Debug)]
+pub struct FilterAllUserOptions {
+    pub username: Option<String>,
+    pub password_hash: Option<String>,
+}
+
+#[derive(Deserialize, Debug)]
 pub struct FilterOnFormOptions {
     pub page: Option<usize>,
     pub limit: Option<usize>,
@@ -30,12 +36,12 @@ pub struct CreateMessageSchema {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UpdateMessageSchema {
-                                            #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub title: Option<String>,
-                                            #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub content: Option<String>,
-                                            #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub form_title: Option<String>,
-                                            #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub published: Option<bool>,
 }

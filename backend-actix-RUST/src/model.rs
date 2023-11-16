@@ -24,18 +24,33 @@ pub struct FormMessageModelResponse {
     pub updatedAt: chrono::DateTime<chrono::Utc>,
 }
 
-#[derive(Debug, Deserialize, Serialize, sqlx::FromRow)]
-#[allow(non_snake_case)]
+
+#[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
 pub struct UserModel {
-    pub id: String,
+    pub id: i32,
+    pub username: String,
+    pub email: String,
+    pub password_hash: String,
+    pub registration_date: Option<chrono::DateTime<chrono::Utc>>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct UserModelResponse {
+    pub id: i32,
+    pub username: String,
+    pub email: String,
+    pub registration_date: Option<chrono::DateTime<chrono::Utc>>, 
+}
+
+#[derive(Debug, Deserialize ,Serialize)]
+pub struct UserAddRequestModel{
     pub username: String,
     pub password: String,
+    pub email: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-#[allow(non_snake_case)]
-pub struct UserModelResponse {
-    pub id: String,
-    pub username: String,
-    pub password: String,
+pub struct AuthUserRequestModel {
+    pub username: String, 
+    pub password: String, 
 }

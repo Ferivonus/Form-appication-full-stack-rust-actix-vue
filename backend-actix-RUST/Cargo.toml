@@ -18,3 +18,4 @@ dotenv = "0.15.0"
 env_logger = "0.10.0"
 sqlx = { version = "0.7.2", features = ["runtime-async-std-native-tls", "mysql", "chrono", "uuid"] }
 uuid = { version = "1.2.2", features = ["serde", "v4"] }
+rand = "0.8.5"
