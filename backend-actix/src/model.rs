@@ -1,15 +1,18 @@
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 
-
+// Last version which I did last night:
 #[derive(Debug, Deserialize, Serialize, FromRow)]
 pub struct FormMessageModel {
     pub id: i32,
+    pub random_string_to_get_id_after_create: String,
+    pub user_id: i32,
     pub form_title: String,
     pub title: String,
     pub content: String,
-    pub answers_of_content: Vec<Box<FormMessageModel>>, // More than one answer
-    pub published: i8,
+    pub published: bool,
+    pub answered_count: i32,
+    pub is_answer: bool,
     pub created_at: Option<chrono::DateTime<chrono::Utc>>,
     pub updated_at: Option<chrono::DateTime<chrono::Utc>>,
 }
