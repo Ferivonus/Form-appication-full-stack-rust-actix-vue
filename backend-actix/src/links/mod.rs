@@ -12,7 +12,7 @@ pub async fn serve_form_page(req: HttpRequest) -> actix_web::Result<actix_files:
 
     let form_file_path = "static/Form Pages/";
     // Manually specify the allowed Form names
-    let allowed_form_names = ["chatting","astrology", "game", "sport", "software"];
+    let allowed_form_names = ["chatting","astrology", "game", "sport", "software", "anime"];
 
     // Check if the requested form name is allowed
     if allowed_form_names.contains(&form_name) {

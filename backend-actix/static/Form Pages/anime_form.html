@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="/static/css/formbasic.css">
+    <script src="/static/javascript/formMessageApi.js"></script>
+    <title>Anime Form</title>
+</head>
+<body>
+    <header>
+        <h1>Anime Form</h1>
+        <p>Welcome to my Anime form.</p>
+    </header>
+
+    <main>
+        <form id="messageForm">
+            <label for="title">New Form Title:</label>
+            <input type="text" id="title" name="title" required><br>
+    
+            <label for="content">Form title's content:</label>
+            <textarea id="content" name="content" required></textarea><br>
+    
+            <button type="submit">Create Form post title</button>
+        </form>
+    
+    </main>
+
+    <h2>eski mesajlar:</h2>
+
+    <div class="message-container" id="formMessages">
+        <!-- Messages will be dynamically added here -->
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2023 Anime Forum</p>
+    </div>
+
+    <script>
+        // Fetch messages when the page loads
+        window.onload = () => fetchAndDisplayMessages('anime');
+
+        // Event listener for the message form
+        document.getElementById('messageForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            AddFormTitleMessage('anime');
+        });
+    </script>
+  
+</body>
+</html>
