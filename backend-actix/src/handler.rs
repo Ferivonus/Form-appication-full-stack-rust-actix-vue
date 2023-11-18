@@ -434,7 +434,7 @@ pub struct Nums {
     second: u64,
 }
 
-//    /multiply?first=5&second=2 
+//    /multiply?first=5&second=2
 #[get("/multiply")]
 pub async fn multiply(nums: web::Query<Nums>) -> impl Responder {
     format!("Result: {}!", nums.first * nums.second)

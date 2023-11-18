@@ -177,6 +177,7 @@ async function findUserByMailAndPassword() {
             data.users.forEach(user => {
                 const userElement = document.createElement('div');
                 userElement.innerHTML = `
+                    <p></p>
                     <p>ID: ${user.id}</p>
                     <p>Username: ${user.username}</p>
                     <p>Email: ${user.email}</p>
