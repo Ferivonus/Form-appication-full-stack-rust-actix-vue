@@ -740,22 +740,20 @@ CREATE TABLE IF NOT EXISTS anime_form_messages_message_info (
 	FOREIGN KEY (random_string_identifier) REFERENCES anime_form_messages_random_string(random_string_to_get_id_after_create)
 );
 
--- Anime form answers location 
-CREATE TABLE IF NOT EXISTS anime_form_messages_answered_to_node (
-    random_string_identifier VARCHAR(255) NOT NULL, -- first node to show answering message
-    answered_messages_string_value VARCHAR(255) NOT NULL,  -- second node to show answered message
-	FOREIGN KEY (random_string_identifier) REFERENCES anime_form_messages_random_string(random_string_to_get_id_after_create)
-);
-
-
-
-
 -- Anime form has image info
 CREATE TABLE IF NOT EXISTS anime_form_messages_has_image_information (
     random_string_identifier VARCHAR(255) NOT NULL,
     has_image bool DEFAULT FALSE,
 	FOREIGN KEY (random_string_identifier) REFERENCES anime_form_messages_random_string(random_string_to_get_id_after_create)
 );
+
+-- anime image counter
+CREATE TABLE IF NOT EXISTS anime_form_messages_image_counter (
+	counter_of_image INT AUTO_INCREMENT PRIMARY KEY,
+	random_string_identifier VARCHAR(255) NOT NULL, -- to understand which message is it.
+	FOREIGN KEY (random_string_identifier) REFERENCES anime_form_messages_random_string(random_string_to_get_id_after_create)
+);
+
 
 -- INSERT INTO images (image_data, image_name) VALUES (LOAD_FILE('/path/to/your/image.jpg'), 'image.jpg');
 -- anime image informations
@@ -809,13 +807,12 @@ CREATE TABLE IF NOT EXISTS anime_form_messages_message_time_info (
 	FOREIGN KEY (random_string_identifier) REFERENCES anime_form_messages_random_string(random_string_to_get_id_after_create)
 );
 
--- anime image counter
-CREATE TABLE IF NOT EXISTS anime_form_messages_image_counter (
-	counter_of_image INT AUTO_INCREMENT PRIMARY KEY,
-	random_string_identifier VARCHAR(255) NOT NULL, -- to understand which message is it.
+-- Anime form answers location 
+CREATE TABLE IF NOT EXISTS anime_form_messages_answered_to_node (
+    random_string_identifier VARCHAR(255) NOT NULL, -- first node to show answering message
+    answered_messages_string_value VARCHAR(255) NOT NULL,  -- second node to show answered message
 	FOREIGN KEY (random_string_identifier) REFERENCES anime_form_messages_random_string(random_string_to_get_id_after_create)
 );
-
 
 -- anime form getting content from random string
 CREATE TABLE IF NOT EXISTS anime_form_answered_messages_info (
@@ -854,7 +851,7 @@ ALTER TABLE software_form_messages_random_string AUTO_INCREMENT = 1;
 ALTER TABLE anime_form_messages_image_counter AUTO_INCREMENT = 1;
 ALTER TABLE anime_form_messages_random_string AUTO_INCREMENT = 1;
 
--- Inserting messages to anime form, it has not any images: first code to execute
+-- Inserting messages to anime form, it has not any images: first code to e
 
 INSERT INTO anime_form_messages_random_string (random_string_to_get_id_after_create) VALUES ('şifreli_mesaj_1'); -- where random_string_to_get_id_after_create = şifreli_mesaj get id
 INSERT INTO track_messages_main_table (main_table_all_random_string_identifiers, user_id, is_answer, form_type) VALUES ('şifreli_mesaj_1', 1, FALSE, 'anime'); -- user id setted 1 as default
