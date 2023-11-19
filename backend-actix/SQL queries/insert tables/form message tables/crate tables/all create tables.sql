@@ -1,119 +1,3 @@
-
-	-- Chatting form drop tables:
-
-DROP TABLE IF EXISTS chatting_form_messages_answered_counter;
-DROP TABLE IF EXISTS chatting_form_messages_publishing_control;
-DROP TABLE IF EXISTS chatting_form_messages_message_info;
-DROP TABLE IF EXISTS chatting_form_messages_has_image_information;
-DROP TABLE IF EXISTS chatting_form_messages_image_counter;
-DROP TABLE IF EXISTS chatting_form_messages_image_information;
-DROP TABLE IF EXISTS chatting_form_messages_image_time_infos;
-DROP TABLE IF EXISTS chatting_form_messages_image_how_many_times_answered;
-DROP TABLE IF EXISTS chatting_form_messages_image_like_dislake_founded_funny;
-DROP TABLE IF EXISTS chatting_form_messages_like_dislake_information;
-DROP TABLE IF EXISTS chatting_form_messages_message_time_info;
-DROP TABLE IF EXISTS chatting_form_messages_answered_to_node;
-DROP TABLE IF EXISTS chatting_form_answered_messages_info;
-
-	-- astrology form drop tables:
-
-DROP TABLE IF EXISTS astrology_form_messages_answered_counter;
-DROP TABLE IF EXISTS astrology_form_messages_publishing_control;
-DROP TABLE IF EXISTS astrology_form_messages_message_info;
-DROP TABLE IF EXISTS astrology_form_messages_has_image_information;
-DROP TABLE IF EXISTS astrology_form_messages_image_counter;
-DROP TABLE IF EXISTS astrology_form_messages_image_information;
-DROP TABLE IF EXISTS astrology_form_messages_image_time_infos;
-DROP TABLE IF EXISTS astrology_form_messages_image_how_many_times_answered;
-DROP TABLE IF EXISTS astrology_form_messages_image_like_dislake_founded_funny;
-DROP TABLE IF EXISTS astrology_form_messages_like_dislake_information;
-DROP TABLE IF EXISTS astrology_form_messages_message_time_info;
-DROP TABLE IF EXISTS astrology_form_messages_answered_to_node;
-DROP TABLE IF EXISTS astrology_form_answered_messages_info;
-DROP TABLE IF EXISTS astrology_form_messages_random_string;
-    
-	-- game form drop tables:
-
-DROP TABLE IF EXISTS game_form_messages_answered_counter;
-DROP TABLE IF EXISTS game_form_messages_publishing_control;
-DROP TABLE IF EXISTS game_form_messages_message_info;
-DROP TABLE IF EXISTS game_form_messages_has_image_information;
-DROP TABLE IF EXISTS game_form_messages_image_counter;
-DROP TABLE IF EXISTS game_form_messages_image_information;
-DROP TABLE IF EXISTS game_form_messages_image_time_infos;
-DROP TABLE IF EXISTS game_form_messages_image_how_many_times_answered;
-DROP TABLE IF EXISTS game_form_messages_image_like_dislake_founded_funny;
-DROP TABLE IF EXISTS game_form_messages_like_dislake_information;
-DROP TABLE IF EXISTS game_form_messages_message_time_info;
-DROP TABLE IF EXISTS game_form_messages_answered_to_node;
-DROP TABLE IF EXISTS game_form_answered_messages_info;
-DROP TABLE IF EXISTS game_form_messages_random_string;
-    
-DROP TABLE IF EXISTS sport_form_answered_messages_info;
-	-- sport form drop tables:
-
-DROP TABLE IF EXISTS sport_form_messages_answered_counter;
-DROP TABLE IF EXISTS sport_form_messages_publishing_control;
-DROP TABLE IF EXISTS sport_form_messages_message_info;
-DROP TABLE IF EXISTS sport_form_messages_has_image_information;
-DROP TABLE IF EXISTS sport_form_messages_image_counter;
-DROP TABLE IF EXISTS sport_form_messages_image_information;
-DROP TABLE IF EXISTS sport_form_messages_image_time_infos;
-DROP TABLE IF EXISTS sport_form_messages_image_how_many_times_answered;
-DROP TABLE IF EXISTS sport_form_messages_image_like_dislake_founded_funny;
-DROP TABLE IF EXISTS sport_form_messages_like_dislake_information;
-DROP TABLE IF EXISTS sport_form_messages_message_time_info;
-DROP TABLE IF EXISTS sport_form_messages_answered_to_node;
-DROP TABLE IF EXISTS sport_form_answered_messages_info;
-DROP TABLE IF EXISTS sport_form_messages_random_string;
-
-	-- software form drop tables:
-
-DROP TABLE IF EXISTS software_form_messages_answered_counter;
-DROP TABLE IF EXISTS software_form_messages_publishing_control;
-DROP TABLE IF EXISTS software_form_messages_message_info;
-DROP TABLE IF EXISTS software_form_messages_has_image_information;
-DROP TABLE IF EXISTS software_form_messages_image_counter;
-DROP TABLE IF EXISTS software_form_messages_image_information;
-DROP TABLE IF EXISTS software_form_messages_image_time_infos;
-DROP TABLE IF EXISTS software_form_messages_image_how_many_times_answered;
-DROP TABLE IF EXISTS software_form_messages_image_like_dislake_founded_funny;
-DROP TABLE IF EXISTS software_form_messages_like_dislake_information;
-DROP TABLE IF EXISTS software_form_messages_message_time_info;
-DROP TABLE IF EXISTS software_form_messages_answered_to_node;
-DROP TABLE IF EXISTS software_form_answered_messages_info;
-DROP TABLE IF EXISTS software_form_messages_random_string;
-
-	-- anime form drop tables:
-
-DROP TABLE IF EXISTS anime_form_messages_answered_counter;
-DROP TABLE IF EXISTS anime_form_messages_publishing_control;
-DROP TABLE IF EXISTS anime_form_messages_message_info;
-DROP TABLE IF EXISTS anime_form_messages_has_image_information;
-DROP TABLE IF EXISTS anime_form_messages_image_counter;
-DROP TABLE IF EXISTS anime_form_messages_image_information;
-DROP TABLE IF EXISTS anime_form_messages_image_time_infos;
-DROP TABLE IF EXISTS anime_form_messages_image_how_many_times_answered;
-DROP TABLE IF EXISTS anime_form_messages_image_like_dislake_founded_funny;
-DROP TABLE IF EXISTS anime_form_messages_like_dislake_information;
-DROP TABLE IF EXISTS anime_form_messages_message_time_info;
-DROP TABLE IF EXISTS anime_form_messages_answered_to_node;
-DROP TABLE IF EXISTS anime_form_answered_messages_info;
-DROP TABLE IF EXISTS anime_form_messages_random_string;
-
-	-- main table drop table
-DROP TABLE IF EXISTS track_messages_main_table;
-
-
-DROP TABLE IF EXISTS id_to_username;
-
-DROP TABLE IF EXISTS user_security_model_question; 
-DROP TABLE IF EXISTS user_security_model_telephone_number; 
-DROP TABLE IF EXISTS user_security_model_saving_mail; 
-DROP TABLE IF EXISTS user_model_socials; 
-DROP TABLE IF EXISTS users; 
-	
-
     -- Big table on the top all of them
 CREATE TABLE IF NOT EXISTS track_messages_main_table (
     counter_of_form_messages INT AUTO_INCREMENT PRIMARY KEY,
@@ -740,22 +624,20 @@ CREATE TABLE IF NOT EXISTS anime_form_messages_message_info (
 	FOREIGN KEY (random_string_identifier) REFERENCES anime_form_messages_random_string(random_string_to_get_id_after_create)
 );
 
--- Anime form answers location 
-CREATE TABLE IF NOT EXISTS anime_form_messages_answered_to_node (
-    random_string_identifier VARCHAR(255) NOT NULL, -- first node to show answering message
-    answered_messages_string_value VARCHAR(255) NOT NULL,  -- second node to show answered message
-	FOREIGN KEY (random_string_identifier) REFERENCES anime_form_messages_random_string(random_string_to_get_id_after_create)
-);
-
-
-
-
 -- Anime form has image info
 CREATE TABLE IF NOT EXISTS anime_form_messages_has_image_information (
     random_string_identifier VARCHAR(255) NOT NULL,
     has_image bool DEFAULT FALSE,
 	FOREIGN KEY (random_string_identifier) REFERENCES anime_form_messages_random_string(random_string_to_get_id_after_create)
 );
+
+-- anime image counter
+CREATE TABLE IF NOT EXISTS anime_form_messages_image_counter (
+	counter_of_image INT AUTO_INCREMENT PRIMARY KEY,
+	random_string_identifier VARCHAR(255) NOT NULL, -- to understand which message is it.
+	FOREIGN KEY (random_string_identifier) REFERENCES anime_form_messages_random_string(random_string_to_get_id_after_create)
+);
+
 
 -- INSERT INTO images (image_data, image_name) VALUES (LOAD_FILE('/path/to/your/image.jpg'), 'image.jpg');
 -- anime image informations
@@ -809,13 +691,12 @@ CREATE TABLE IF NOT EXISTS anime_form_messages_message_time_info (
 	FOREIGN KEY (random_string_identifier) REFERENCES anime_form_messages_random_string(random_string_to_get_id_after_create)
 );
 
--- anime image counter
-CREATE TABLE IF NOT EXISTS anime_form_messages_image_counter (
-	counter_of_image INT AUTO_INCREMENT PRIMARY KEY,
-	random_string_identifier VARCHAR(255) NOT NULL, -- to understand which message is it.
+-- Anime form answers location 
+CREATE TABLE IF NOT EXISTS anime_form_messages_answered_to_node (
+    random_string_identifier VARCHAR(255) NOT NULL, -- first node to show answering message
+    answered_messages_string_value VARCHAR(255) NOT NULL,  -- second node to show answered message
 	FOREIGN KEY (random_string_identifier) REFERENCES anime_form_messages_random_string(random_string_to_get_id_after_create)
 );
-
 
 -- anime form getting content from random string
 CREATE TABLE IF NOT EXISTS anime_form_answered_messages_info (
@@ -853,142 +734,3 @@ ALTER TABLE software_form_messages_random_string AUTO_INCREMENT = 1;
 -- anime tables counters are asigned to 1
 ALTER TABLE anime_form_messages_image_counter AUTO_INCREMENT = 1;
 ALTER TABLE anime_form_messages_random_string AUTO_INCREMENT = 1;
-
--- Inserting messages to anime form, it has not any images: first code to execute
-
-INSERT INTO anime_form_messages_random_string (random_string_to_get_id_after_create) VALUES ('şifreli_mesaj_1'); -- where random_string_to_get_id_after_create = şifreli_mesaj get id
-INSERT INTO track_messages_main_table (main_table_all_random_string_identifiers, user_id, is_answer, form_type) VALUES ('şifreli_mesaj_1', 1, FALSE, 'anime'); -- user id setted 1 as default
-INSERT INTO anime_form_messages_message_info ( random_String_identifier, sender_user_id, title, content) VALUES ('şifreli_mesaj_1', 1,'Which anime I should watch', 'Do you guys recomant me that watch hunter x hunter?'); -- in same function that will asigned as step 2 action, it will take id.
-INSERT INTO anime_form_messages_message_time_info( random_String_identifier ) VALUES ('şifreli_mesaj_1');
-INSERT INTO anime_form_messages_has_image_information ( random_String_identifier, has_image ) VALUES ('şifreli_mesaj_1',FALSE);
-INSERT INTO anime_form_messages_publishing_control (random_string_identifier, published) VALUES ('şifreli_mesaj_1', TRUE);
-
--- Setting defaults.
-INSERT INTO anime_form_messages_like_dislake_information (random_string_identifier) VALUES ('şifreli_mesaj_1');
-INSERT INTO anime_form_messages_answered_counter (random_string_identifier) VALUES ('şifreli_mesaj_1');
-
-
-
--- Inserting messages to anime form to answer first message, it has not any images : Ansering to message 1 which in normal form message with no image.sql
-
-INSERT INTO anime_form_messages_random_string (random_string_to_get_id_after_create) VALUES ('şifreli_mesaj_2'); -- where random_string_to_get_id_after_create = şifreli_mesaj get id
-INSERT INTO track_messages_main_table (main_table_all_random_string_identifiers, user_id, is_answer, form_type) VALUES ('şifreli_mesaj_2', 2, TRUE, 'anime'); -- user id setted 2 as default
--- I need to get datas which are " where sender sending message and it's random_string to get data ".
-INSERT INTO anime_form_messages_message_info ( random_String_identifier, sender_user_id, title, content) VALUES ('şifreli_mesaj_2', 2,'Which anime I should watch', 'Actually I dont like hunter x hunter, just watch mirai nikki'); -- in same function that will asigned as step 2 action, it will take id.
-INSERT INTO anime_form_messages_message_time_info( random_String_identifier ) VALUES ('şifreli_mesaj_2');
-INSERT INTO anime_form_messages_has_image_information ( random_String_identifier, has_image ) VALUES ('şifreli_mesaj_2',FALSE);
-INSERT INTO anime_form_messages_publishing_control (random_string_identifier, published) VALUES ('şifreli_mesaj_2', TRUE);
-
--- Setting defaults.
-INSERT INTO anime_form_messages_like_dislake_information (random_string_identifier) VALUES ('şifreli_mesaj_2');
-INSERT INTO anime_form_messages_answered_counter (random_string_identifier) VALUES ('şifreli_mesaj_2');
-
--- update main message to set a new answered
-UPDATE anime_form_messages_answered_counter SET answered_count = answered_count + 1 WHERE random_string_identifier = 'şifreli_mesaj_1';
--- update main message to set founded funny 
-UPDATE anime_form_messages_like_dislake_information SET founded_funny = founded_funny + 1 WHERE random_string_identifier = 'şifreli_mesaj_1';
-
--- Connecting with answered message:
-
-INSERT INTO anime_form_messages_answered_to_node (random_string_identifier, answered_messages_string_value) VALUES ('şifreli_mesaj_2','şifreli_mesaj_1');
-INSERT INTO anime_form_answered_messages_info (random_string_identifier, title_of_answered_message, content_of_answered_message) VALUES ('şifreli_mesaj_2','Which anime I should watch', 'Do you guys recomant me that watch hunter x hunter?' );
-
-
-
-    -- Users table:
-    
-CREATE TABLE IF NOT EXISTS id_to_username (
-    user_id INT NOT NULL,
-    username VARCHAR(50) NOT NULL UNIQUE
-);
-
-CREATE TABLE IF NOT EXISTS users (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(50) NOT NULL UNIQUE,
-    name VARCHAR(50) NOT NULL,
-    surname VARCHAR(50) NOT NULL,
-    email VARCHAR(100) NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
-    sex VARCHAR(30) NOT NULL,
-    favorite_anime_girl VARCHAR(255),
-    last_login_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_account_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
--- UserSecurityModelQuestion table:
-CREATE TABLE IF NOT EXISTS user_security_model_question (
-    user_id INT PRIMARY KEY,
-    user_using_question BOOLEAN NOT NULL,
-    security_question VARCHAR(255),
-    security_answer VARCHAR(255),
-    FOREIGN KEY (user_id) REFERENCES users(id),
-	updated_question_security_model_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
--- UserSecurityModelNumber table:
-CREATE TABLE IF NOT EXISTS user_security_model_telephone_number (
-    user_id INT PRIMARY KEY,
-    user_using_number BOOLEAN NOT NULL,
-    tel_number BIGINT,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-	updated_telephone_number_security_model_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
--- UserSecurityModelSavingMail table:
-CREATE TABLE IF NOT EXISTS user_security_model_saving_mail (
-    user_id INT PRIMARY KEY,
-    user_using_saving_mail BOOLEAN NOT NULL,
-    extra_mail VARCHAR(100),
-    FOREIGN KEY (user_id) REFERENCES users(id),
-	updated_saving_mail_security_model_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
--- UserModelSocials table:
-CREATE TABLE IF NOT EXISTS user_model_socials (
-    user_id INT PRIMARY KEY,
-    facebook VARCHAR(255),
-    twitter VARCHAR(255),
-    instagram VARCHAR(255),
-    linkedin VARCHAR(255),
-    personal_website VARCHAR(255),
-    FOREIGN KEY (user_id) REFERENCES users(id),
-	updated_user_model_socials_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
--- Inserting data into 'users' table
-INSERT INTO users (username, name, surname, email, password_hash, sex, favorite_anime_girl)
-VALUES ('alice_smith', 'Alice', 'Smith', 'alice.smith@example.com', 'hashed_password_456', 'Female', 'Saber'),
-       ('bob_jones', 'Bob', 'Jones', 'bob.jones@example.com', 'hashed_password_789', 'Male', 'Rem'),
-       ('eva_williams', 'Eva', 'Williams', 'eva.williams@example.com', 'hashed_password_012', 'Female', 'Luffy');
-
--- Inserting data into 'user_security_model_question' table
-INSERT INTO user_security_model_question (user_id, user_using_question, security_question, security_answer)
-VALUES (1, true, 'What is your favorite color?', 'Blue'),
-       (2, true, 'In which city were you born?', 'New York'),
-       (3, false, NULL, NULL);
-
--- Inserting data into 'user_security_model_telephone_number' table
-INSERT INTO user_security_model_telephone_number (user_id, user_using_number, tel_number)
-VALUES (1, true, 5557782939),
-       (2, true, 5557782939),
-       (3, false, NULL);
-
--- Inserting data into 'user_security_model_saving_mail' table
-INSERT INTO user_security_model_saving_mail (user_id, user_using_saving_mail, extra_mail)
-VALUES (1, true, 'backup_email@example.com'),
-       (2, false, NULL),
-       (3, true, 'secondary_email@example.com');
-
-
-
-
-
-
--- Inserting data into 'user_model_socials' table
-INSERT INTO user_model_socials (user_id, facebook, twitter, instagram, linkedin, personal_website)
-VALUES (1, 'facebook.com/alice', 'twitter.com/alice', 'instagram.com/alice', 'linkedin.com/in/alice', 'alice.com'),
-       (2, 'facebook.com/bob', 'twitter.com/bob', 'instagram.com/bob', 'linkedin.com/in/bob', 'bob.com'),
-       (3, NULL, NULL, NULL, NULL, NULL);
-
-SELECT * FROM users;
