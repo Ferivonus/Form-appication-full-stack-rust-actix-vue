@@ -2,6 +2,35 @@ use chrono::DateTime;
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 
+// Last version which I did last night:
+#[derive(Debug, Deserialize, Serialize, FromRow)]
+pub struct FormMessageModel {
+    pub id: i32,
+    pub random_string_to_get_id_after_create: String,
+    pub user_id: i32,
+    pub form_title: String,
+    pub title: String,
+    pub content: String,
+    pub published: bool,
+    pub answered_count: i32,
+    pub is_answer: bool,
+    pub created_at: Option<chrono::DateTime<chrono::Utc>>,
+    pub updated_at: Option<chrono::DateTime<chrono::Utc>>,
+    pub last_updater_username: Option<String>, 
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct FormMessageModelResponse {
+    pub id: i32,
+    pub title: String,
+    pub content: String,
+    pub form_title: String,
+    pub published: bool,
+    pub create_at: chrono::DateTime<chrono::Utc>,
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    pub last_updater_username: Option<String>, 
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct RandomStringModel {
     pub id: i32,

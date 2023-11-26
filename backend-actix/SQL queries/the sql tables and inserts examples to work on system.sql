@@ -1,7 +1,5 @@
 
 	-- Chatting form drop tables:
-
-DROP TABLE IF EXISTS chatting_form_messages_answered_counter;
 DROP TABLE IF EXISTS chatting_form_messages_publishing_control;
 DROP TABLE IF EXISTS chatting_form_messages_message_info;
 DROP TABLE IF EXISTS chatting_form_messages_has_image_information;

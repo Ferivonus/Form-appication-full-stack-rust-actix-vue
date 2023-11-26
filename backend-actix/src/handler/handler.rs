@@ -1,14 +1,40 @@
 // src/handlers.rs: 
 use crate::{
     schema::{CreateMessageSchema, FilterAllMessagesOptions, FilterOnFormOptions},
+    handler::models::{
+        form_models::{
+            RandomStringModel,
+            AnsweredCounterModel,
+            PublishingControlModel,
+            MessageInfoModel,
+            HasImageInfoModel,
+            ImageCounterModel,
+            ImageInformationModel,
+            ImageTimeInfoModel,
+            ImageHowManyTimesAnsweredModel,
+            ImageLikeDislikeFunnyModel,
+            LikeDislikeInformationModel,
+            MessageTimeInfoModel,
+            AnsweredToNodeModel,
+            AnsweredMessagesInfoModel,
+            FormMessageModel, 
+            FormMessageModelResponse,
+        },
+        user_models::{
+            UserModel,
+            UserSecurityModelQuestion,
+            UserSecurityModelTelephoneNumber,
+            UserSecurityModelSavingMail,
+            UserModelSocials,
+            UserModelResponse,
+            UserAddRequestModel,
+            AuthUserRequestModelUsername,
+            AuthUserRequestModelMail,
+        },
+    },
     AppState,
 };
 
-use crate::handler::models::form_models::{
-    RandomStringModel,
-    AnsweredCounterModel,
-    PublishingControlModel,
-};
 
 use serde::Deserialize;
 use chrono::{ Utc, TimeZone};
@@ -30,16 +56,22 @@ pub async fn every_message_handler(
 ) -> impl Responder {
     let limit = opts.limit.unwrap_or(10);
     let offset = (opts.page.unwrap_or(1) - 1) * limit;
+    let form_name_of_link = "anime";
 
-    let messages: Vec<FormMessageModel> = sqlx::query_as!(
-        FormMessageModel,
-        r#"SELECT * FROM form_messages ORDER by id LIMIT ? OFFSET ?"#,
+    let query = format!(
+        "SELECT * FROM anime_form_messages_message_info WHERE ORDER by sender_user_id LIMIT ? OFFSET ?"
+    );
+    
+    let messages: Vec<MessageInfoModel> = sqlx::query_as!(
+        MessageInfoModel,
+        &query,
         limit as i32,
         offset as i32
     )
     .fetch_all(&data.db)
     .await
     .unwrap();
+    
 
     let note_responses = messages
         .into_iter()
@@ -76,10 +108,14 @@ pub async fn form_message_list_by_form_name_handler(
     }
 
 
-    let messages: Vec<FormMessageModel> = sqlx::query_as!(
-        FormMessageModel,
-        r#"SELECT * FROM form_messages WHERE form_title = ? AND published = true ORDER by id LIMIT ? OFFSET ?"#,
-        form_name_of_link,
+    let sql_query = format!(
+        "SELECT * FROM {}_form_messages WHERE published = true ORDER by id LIMIT ? OFFSET ?",
+        form_name_of_link
+    );
+    
+    let messages: Vec<MessageInfoModel> = sqlx::query_as!(
+        MessageInfoModel,
+        &sql_query,
         limit as i32,
         offset as i32
     )
@@ -153,10 +189,11 @@ fn filter_db_record(form_message: &FormMessageModel) -> FormMessageModelResponse
         id: form_message.id.to_owned(),
         title: form_message.title.to_owned(),
         content: form_message.content.to_owned(),
-        form_title: form_message.form_title.to_owned().unwrap(),
-        published: form_message.published != 0,
-        createdAt: form_message.created_at.unwrap(),
-        updatedAt: form_message.updated_at.unwrap(),
+        form_title: form_message.form_title.to_owned(),
+        published: form_message.published != false,
+        create_at: form_message.created_at.unwrap(),
+        updated_at: form_message.updated_at.unwrap(),
+        last_updater_username: todo!(),
     }
 }
 
@@ -197,11 +234,14 @@ pub async fn get_user_by_username(
                         .unwrap_or_default();
 
                     UserModelResponse {
-                        id: user.id,
-                        username: user.username,
-                        email: user.email,
-                        registration_date: Some(registration_date_string), // Use String here
-                    }
+                        username:user.username,
+                        email:user.email,
+                        registration_date:Some(registration_date_string), 
+                        user_id: todo!(), 
+                        tel_number: todo!(), 
+                        sex: todo!(), 
+                        favorite_anime_girl: todo!(), 
+                        updated_account_date: todo!() }
                 })
                 .collect::<Vec<UserModelResponse>>();
 
@@ -259,11 +299,14 @@ pub async fn get_user_by_email(
                         .unwrap_or_default();
 
                     UserModelResponse {
-                        id: user.id,
-                        username: user.username,
-                        email: user.email,
-                        registration_date: Some(registration_date_string),
-                    }
+                        username:user.username,
+                        email:user.email,
+                        registration_date:Some(registration_date_string), 
+                        user_id: todo!(), 
+                        tel_number: todo!(), 
+                        sex: todo!(), 
+                        favorite_anime_girl: todo!(), 
+                        updated_account_date: todo!() }
                 })
                 .collect::<Vec<UserModelResponse>>();
 
