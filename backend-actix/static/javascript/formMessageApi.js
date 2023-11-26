@@ -203,7 +203,7 @@ function registerUser() {
         password: document.getElementById('Registerpassword').value,
         email: document.getElementById('Registeremail').value,
     }
-
+    
     const requestOptions = {
         method: 'POST',
         headers: {

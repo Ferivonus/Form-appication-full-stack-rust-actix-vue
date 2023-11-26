@@ -8,10 +8,8 @@ use actix_web::middleware::Logger;
 use dotenv::dotenv;
 use sqlx::mysql::{MySqlPool, MySqlPoolOptions};
 
-mod handler;
-mod model;
 mod schema;
-
+mod handler;
 mod links;
 
 pub struct AppState {
@@ -47,12 +45,19 @@ async fn main() -> std::io::Result<()> {
     println!("🚀 ractix back-end system started successfully");
 
 
-    let mut handlebars = Handlebars::new();
-    handlebars
+    let mut book_handlebars = Handlebars::new();
+    book_handlebars
         .register_template_file("bookpage_template", "static/templates/bookpage_template.html")
         .unwrap();
-    let handlebars_ref = web::Data::new(handlebars);
-
+    let book_handlebars_ref = web::Data::new(book_handlebars);
+    
+    
+    let mut form_handlebars = Handlebars::new();
+    form_handlebars
+        .register_template_file("form_page_template", "static/templates/form_page_template.html")
+        .unwrap();
+    let form_handlebars_ref2 = web::Data::new(form_handlebars);
+   
     HttpServer::new(move || {
 
         let cors = Cors::default()
@@ -67,9 +72,10 @@ async fn main() -> std::io::Result<()> {
             .supports_credentials();
 
         App::new()
-            .app_data(handlebars_ref.clone())
+            .app_data(book_handlebars_ref.clone())
+            .app_data(form_handlebars_ref2.clone())
             .app_data(web::Data::new(AppState { db: pool.clone() }))
-            .configure(handler::config)
+            .configure(handler::handler::config)
             .wrap(cors)
             .wrap(Logger::default())
             .route("/bookpage", web::get().to(links::book_page))
@@ -81,16 +87,14 @@ async fn main() -> std::io::Result<()> {
                 }
             }))
             .service(
-                web::resource("/form/{form_link}")
-                    .route(web::get().to(links::serve_form_page)),
-            )
-            .service(
                 web::resource("/user/{user_link}")
                     .route(web::get().to(links::serve_user_page)),
             )
             .service(
                 actix_files::Files::new("/static", "static").show_files_listing()
             )
+            .configure(links::template_links::form_page_template_config)
+
     })
     .bind("127.0.0.1:8080")?
     // .bind("127.0.0.1:80")? masal için tor (These lines are commented out)

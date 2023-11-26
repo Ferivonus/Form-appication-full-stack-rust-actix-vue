@@ -1,9 +1,13 @@
-
 // src/handlers.rs: 
 use crate::{
-    model::{FormMessageModel, FormMessageModelResponse, UserModel, UserModelResponse,UserAddRequestModel,AuthUserRequestModelUsername,AuthUserRequestModelMail},
     schema::{CreateMessageSchema, FilterAllMessagesOptions, FilterOnFormOptions},
     AppState,
+};
+
+use crate::handler::models::form_models::{
+    RandomStringModel,
+    AnsweredCounterModel,
+    PublishingControlModel,
 };
 
 use serde::Deserialize;

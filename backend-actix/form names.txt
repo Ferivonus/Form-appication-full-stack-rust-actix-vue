@@ -1,0 +1,5 @@
+anime
+manga
+books
+software
+games
