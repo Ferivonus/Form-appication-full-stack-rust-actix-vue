@@ -984,7 +984,7 @@ VALUES ('alice_smith', true, 'backup_email@example.com'),
 
 
 -- Inserting data into 'user_model_socials' table
-INSERT INTO user_model_socials (user_id, facebook, twitter, instagram, linkedin, personal_website)
+INSERT INTO user_model_socials (username, facebook, twitter, instagram, linkedin, personal_website)
 VALUES ('alice_smith', 'facebook.com/alice', 'twitter.com/alice', 'instagram.com/alice', 'linkedin.com/in/alice', 'alice.com'),
        ('bob_jones', 'facebook.com/bob', 'twitter.com/bob', 'instagram.com/bob', 'linkedin.com/in/bob', 'bob.com'),
        ('eva_williams', NULL, NULL, NULL, NULL, NULL);

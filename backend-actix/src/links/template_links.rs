@@ -1,16 +1,10 @@
 // /links/template_links.rs:
 
-use serde::Deserialize;
 use actix_web::{web, HttpResponse};
 use handlebars::Handlebars;
 use serde_json::json;
 use std::{path::Path, fs::File, io::{BufReader, BufRead, self}};
 
-
-#[derive(Deserialize, Debug)]
-struct FormFilterOptions {
-    pub form_name: String,
-}
 
 pub async fn open_form_page(
     hb: web::Data<Handlebars<'_>>,

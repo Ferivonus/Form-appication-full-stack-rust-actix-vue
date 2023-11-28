@@ -46,3 +46,9 @@ pub struct UpdateMessageSchema {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub published: Option<bool>,
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct  CreateFormSchema{
+    pub form_title: Option<String>,
+    pub user_secret_string_id: Option<String>,
+}
