@@ -19,6 +19,7 @@ use crate::{
             AnsweredMessagesInfoModel,
             FormMessageModel, 
             FormMessageModelResponse,
+            MessageInfoModelResponse,
         },
         user_models::{
             UserModel,
@@ -41,10 +42,18 @@ use chrono::{ Utc, TimeZone};
 
 use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 use serde_json::json;
+use sqlx::{MySql, FromRow};
 
 #[get("/live")]
 async fn form_live_checker_handler() -> impl Responder {
     const MESSAGE: &str = "Form system CRUD API with Rust, SQLX, MySQL, and Actix Web";
+
+    HttpResponse::Ok().json(json!({"status": "success","form_message": MESSAGE}))
+}
+
+#[get("/anan")]
+async fn anan_handler() -> impl Responder {
+    const MESSAGE: &str = "Döne dolaşa buraya geldin, tebrikler.\nAma, ananın amı.";
 
     HttpResponse::Ok().json(json!({"status": "success","form_message": MESSAGE}))
 }
@@ -56,34 +65,32 @@ pub async fn every_message_handler(
 ) -> impl Responder {
     let limit = opts.limit.unwrap_or(10);
     let offset = (opts.page.unwrap_or(1) - 1) * limit;
-    let form_name_of_link = "anime";
+    const form_name_of_link : &str= "anime";
 
     let query = format!(
-        "SELECT * FROM anime_form_messages_message_info WHERE ORDER by sender_user_id LIMIT ? OFFSET ?"
+        r#"SELECT * FROM {}_form_messages_message_info ORDER BY sender_user_id LIMIT ? OFFSET ?"#,
+        form_name_of_link
     );
-    
-    let messages: Vec<MessageInfoModel> = sqlx::query_as!(
-        MessageInfoModel,
-        &query,
-        limit as i32,
-        offset as i32
-    )
+
+    let messages: Vec<MessageInfoModel> = sqlx::query_as::<MySql, MessageInfoModel>(&query)
+    .bind(limit as i32)
+    .bind(offset as i32)
     .fetch_all(&data.db)
     .await
     .unwrap();
-    
 
     let note_responses = messages
         .into_iter()
         .map(|note| filter_db_record(&note))
-        .collect::<Vec<FormMessageModelResponse>>();
+        .collect::<Vec<MessageInfoModelResponse>>();
+    
 
-    let json_response = serde_json::json!({
-        "status": "success",
-        "results": note_responses.len(),
-        "messages": note_responses
-    });
-    HttpResponse::Ok().json(json_response)
+        let json_response = serde_json::json!({
+            "status": "success",
+            "results": note_responses.len(),
+            "messages": note_responses
+        });
+        HttpResponse::Ok().json(json_response)
 }
 
 
@@ -93,13 +100,13 @@ pub async fn form_message_list_by_form_name_handler(
     data: web::Data<AppState>,
     path: web::Path<(String,)>,
 ) -> impl Responder {
-    let form_name_of_link = path.0.clone();
-    let limit = opts.limit.unwrap_or(10);
-    let offset = (opts.page.unwrap_or(1) - 1) * limit;
+    let FORM_NAME_OF_LINK = path.0.clone();
+    let limit_count  = opts.limit.unwrap_or(10);
+    let offset_count  = (opts.page.unwrap_or(1) - 1) * limit_count;
 
     // If form_title is present and not equal to form_name_of_link, return a bad request
     if let Some(ref form_title) = opts.form_title {
-        if form_name_of_link != *form_title {
+        if FORM_NAME_OF_LINK != *form_title {
             return HttpResponse::BadRequest().json(json!({
                 "status": "fail",
                 "message": "form_name_of_link and form_title must be the same"
@@ -110,23 +117,20 @@ pub async fn form_message_list_by_form_name_handler(
 
     let sql_query = format!(
         "SELECT * FROM {}_form_messages WHERE published = true ORDER by id LIMIT ? OFFSET ?",
-        form_name_of_link
+        FORM_NAME_OF_LINK
     );
     
-    let messages: Vec<MessageInfoModel> = sqlx::query_as!(
-        MessageInfoModel,
-        &sql_query,
-        limit as i32,
-        offset as i32
-    )
-    .fetch_all(&data.db)
-    .await
-    .unwrap();
+    let messages: Vec<MessageInfoModel> = sqlx::query_as::<MySql, MessageInfoModel>(&sql_query)
+        .bind(limit_count as i32)
+        .bind(offset_count as i32)
+        .fetch_all(&data.db)
+        .await
+        .unwrap();
 
     let note_responses = messages
         .into_iter()
         .map(|note| filter_db_record(&note))
-        .collect::<Vec<FormMessageModelResponse>>();
+        .collect::<Vec<MessageInfoModelResponse>>();
 
     let json_response = serde_json::json!({
         "status": "success",
@@ -134,6 +138,7 @@ pub async fn form_message_list_by_form_name_handler(
         "messages": note_responses
     });
     HttpResponse::Ok().json(json_response)
+
 }
 
 #[post("/messages/")]
@@ -141,107 +146,124 @@ async fn add_message_handler(
     body: web::Json<CreateMessageSchema>,
     data: web::Data<AppState>,
 ) -> impl Responder {
-    let user_id = uuid::Uuid::new_v4().to_string();
-    let query_result =
-        sqlx::query(r#"INSERT INTO form_messages (id,title,content,form_title,published) VALUES (?, ?, ?, ?, ?)"#)
-            .bind(user_id.clone())
-            .bind(body.title.to_string())
-            .bind(body.content.to_string())
-            .bind(body.form_title.to_owned().unwrap_or_default())
-            .bind(body.published.to_owned().unwrap_or_default())
-            .execute(&data.db)
-            .await
-            .map_err(|err: sqlx::Error| err.to_string());
+    let form_title = body.form_title.to_owned().unwrap_or_default();
+    let sql_query = format!(
+        "INSERT INTO {}_form_messages_message_info (id,title,content,form_title,published) VALUES (?, ?, ?, ?, ?)",
+        &form_title
+    );
 
-    if let Err(err) = query_result {
-        if err.contains("Duplicate entry") {
-            return HttpResponse::BadRequest().json(
-            serde_json::json!({"status": "fail","form_message": "form with that title already exists"}),
-        );
-        }
-
-        return HttpResponse::InternalServerError()
-            .json(serde_json::json!({"status": "error","form_message": format!("{:?}", err)}));
-    }
-
-    let query_result = sqlx::query_as!(FormMessageModel, r#"SELECT * FROM form_messages WHERE id = ?"#, user_id)
-        .fetch_one(&data.db)
-        .await;
+    let query_result = sqlx::query(&sql_query)
+        .bind(&body.user_id)
+        .bind(&body.title)
+        .bind(&body.content)
+        .bind(&form_title)
+        .bind(body.published.unwrap_or_default())
+        .execute(&data.db)
+        .await
+        .map_err(|err| err.to_string());
 
     match query_result {
-        Ok(note) => {
-            let note_response = serde_json::json!({"status": "success","data": serde_json::json!({
-                "note": filter_db_record(&note)
-            })});
+        Ok(_) => {
+            let getting_data_query = format!(
+                "SELECT * FROM {}_form_messages WHERE id = ?",
+                &form_title
+            );
 
-            return HttpResponse::Ok().json(note_response);
+            let query_result: Result<MessageInfoModel, _> = sqlx::query_as::<MySql, MessageInfoModel>(&getting_data_query)
+                .bind(&body.user_id)
+                .fetch_one(&data.db)
+                .await;
+
+            match query_result {
+                Ok(note) => {
+                    let note_response = serde_json::json!({
+                        "status": "success",
+                        "data": {
+                            "note": filter_db_record(&note)
+                        }
+                    });
+                    HttpResponse::Ok().json(note_response)
+                }
+                Err(e) => HttpResponse::InternalServerError().json(serde_json::json!({
+                    "status": "error",
+                    "message": format!("Error retrieving data: {:?}", e)
+                })),
+            }
         }
-        Err(e) => {
-            return HttpResponse::InternalServerError()
-                .json(serde_json::json!({"status": "error","form_message": format!("{:?}", e)}));
+        Err(err) => {
+            HttpResponse::InternalServerError().json(serde_json::json!({
+                "status": "error",
+                "message": format!("Error executing query: {:?}", err)
+            }))
         }
     }
 }
 
 
-fn filter_db_record(form_message: &FormMessageModel) -> FormMessageModelResponse {
-    FormMessageModelResponse {
-        id: form_message.id.to_owned(),
-        title: form_message.title.to_owned(),
-        content: form_message.content.to_owned(),
-        form_title: form_message.form_title.to_owned(),
-        published: form_message.published != false,
-        create_at: form_message.created_at.unwrap(),
-        updated_at: form_message.updated_at.unwrap(),
-        last_updater_username: todo!(),
+
+
+fn filter_db_record(record: &MessageInfoModel) -> MessageInfoModelResponse {
+    MessageInfoModelResponse {
+            random_string_identifier: record.random_string_identifier.clone(),
+            sender_user_id: record.sender_user_id,
+            title: record.title.clone(),
+            content: record.content.clone(),
     }
 }
+
 
 //Users api:
 
-#[post("/user/info/by_username")]
+#[post("/user/get_info/by_username")]
 pub async fn get_user_by_username(
     account: web::Json<AuthUserRequestModelUsername>,
     data: web::Data<AppState>,
 ) -> impl Responder {
     // Destructure the info into individual variables
-    let username = &account.username;
-    let password = &account.password;
+    let username: &String = &account.username;
+    let password: &String = &account.password;
     println!("Username: {}", username);
     println!("Password: {}", password);
 
     // Hash the password using a proper hashing function (e.g., argon2)
-    let password_hash = hash_password(password);
+    let password_hashed: String = hash_password(password);
 
-    let users: Result<Vec<UserModel>, sqlx::Error> = sqlx::query_as!(
-        UserModel,
+    let sql_query = format!(
         "SELECT * FROM users WHERE username = ? AND password_hash = ?",
-        username,
-        &password_hash
-    )
-    .fetch_all(&data.db)
-    .await;
+    );
+
+    let users: Result<Vec<UserModel>, _> = sqlx::query_as::<MySql, UserModel>(&sql_query)
+        .bind(username as &String)
+        .bind(password_hashed as String)
+        .fetch_all(&data.db)
+        .await;
 
     match users {
         Ok(users) => {
             let user_responses = users
                 .into_iter()
                 .map(|user| {
+
                     // Convert Option<chrono::DateTime<Utc>> to String
                     let registration_date_string = user
                         .registration_date
                         .map(|date| Utc.from_utc_datetime(&date.naive_utc()).format("%Y-%m-%d %H:%M:%S").to_string())
                         .unwrap_or_default();
 
+                        let last_login_date_string = user
+                        .last_login_date
+                        .map(|date| Utc.from_utc_datetime(&date.naive_utc()).format("%Y-%m-%d %H:%M:%S").to_string())
+                        .unwrap_or_default();
+
+
                     UserModelResponse {
-                        username:user.username,
-                        email:user.email,
-                        registration_date:Some(registration_date_string), 
-                        user_id: todo!(), 
-                        tel_number: todo!(), 
-                        sex: todo!(), 
-                        favorite_anime_girl: todo!(), 
-                        updated_account_date: todo!() }
+                        user_id: user.id,
+                        username: user.username,
+                        email: user.email,
+                        last_login_date: Some(last_login_date_string),
+                        registration_date: Some(registration_date_string)
+
+                    }
                 })
                 .collect::<Vec<UserModelResponse>>();
 
@@ -264,7 +286,7 @@ pub async fn get_user_by_username(
     }
 }
 
-#[post("/user/info/by_email")]
+#[post("/user/get_info/by_email")]
 pub async fn get_user_by_email(
     account: web::Json<AuthUserRequestModelMail>,
     data: web::Data<AppState>,
@@ -276,37 +298,44 @@ pub async fn get_user_by_email(
     println!("Password: {}", password);
 
     // Hash the password using a proper hashing function (e.g., argon2)
-    let password_hash = hash_password(password);
+    let password_hashed: String = hash_password(password);
 
-    let users: Result<Vec<UserModel>, sqlx::Error> = sqlx::query_as!(
-        UserModel,
+    let sql_query = format!(
         "SELECT * FROM users WHERE email = ? AND password_hash = ?",
-        email,
-        &password_hash
-    )
-    .fetch_all(&data.db)
-    .await;
+    );
+
+    let users: Result<Vec<UserModel>, _> = sqlx::query_as::<MySql, UserModel>(&sql_query)
+        .bind(email as &String)
+        .bind(password_hashed as String)
+        .fetch_all(&data.db)
+        .await;
 
     match users {
         Ok(users) => {
             let user_responses = users
                 .into_iter()
                 .map(|user| {
+
                     // Convert Option<chrono::DateTime<Utc>> to String
                     let registration_date_string = user
                         .registration_date
                         .map(|date| Utc.from_utc_datetime(&date.naive_utc()).format("%Y-%m-%d %H:%M:%S").to_string())
                         .unwrap_or_default();
 
+                        let last_login_date_string = user
+                        .last_login_date
+                        .map(|date| Utc.from_utc_datetime(&date.naive_utc()).format("%Y-%m-%d %H:%M:%S").to_string())
+                        .unwrap_or_default();
+
+
                     UserModelResponse {
-                        username:user.username,
-                        email:user.email,
-                        registration_date:Some(registration_date_string), 
-                        user_id: todo!(), 
-                        tel_number: todo!(), 
-                        sex: todo!(), 
-                        favorite_anime_girl: todo!(), 
-                        updated_account_date: todo!() }
+                        user_id: user.id,
+                        username: user.username,
+                        email: user.email,
+                        last_login_date: Some(last_login_date_string),
+                        registration_date: Some(registration_date_string)
+
+                    }
                 })
                 .collect::<Vec<UserModelResponse>>();
 
@@ -459,6 +488,7 @@ pub async fn add_user(
 pub fn config(conf: &mut web::ServiceConfig) {
     let scope = web::scope("/api")
 
+        .service(anan_handler)
         .service(form_live_checker_handler)
         .service(every_message_handler)
         .service(add_message_handler)

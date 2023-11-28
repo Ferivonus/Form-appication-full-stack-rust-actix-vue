@@ -26,6 +26,7 @@ pub struct ParamOptions {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CreateMessageSchema {
+    pub user_id: i32,
     pub title: String,
     pub content: String,
                                             #[serde(default)]

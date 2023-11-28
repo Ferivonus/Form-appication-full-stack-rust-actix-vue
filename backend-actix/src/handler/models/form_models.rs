@@ -51,13 +51,22 @@ pub struct PublishingControlModel {
     pub publishing_detailes_changed_time: DateTime<chrono::Utc>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, FromRow)]
 pub struct MessageInfoModel {
     pub random_string_identifier: String,
     pub sender_user_id: i32,
     pub title: Option<String>,
     pub content: String,
 }
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct MessageInfoModelResponse {
+    pub random_string_identifier: String,
+    pub sender_user_id: i32,
+    pub title: Option<String>,
+    pub content: String,
+}
+
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct HasImageInfoModel {

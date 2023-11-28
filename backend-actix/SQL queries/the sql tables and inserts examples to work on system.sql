@@ -104,13 +104,13 @@ DROP TABLE IF EXISTS track_messages_main_table;
 
 
 DROP TABLE IF EXISTS id_to_username;
-
 DROP TABLE IF EXISTS user_security_model_question; 
 DROP TABLE IF EXISTS user_security_model_telephone_number; 
 DROP TABLE IF EXISTS user_security_model_saving_mail; 
 DROP TABLE IF EXISTS user_model_socials; 
-DROP TABLE IF EXISTS users; 
-	
+DROP TABLE IF EXISTS users_info;
+DROP TABLE IF EXISTS users;
+
 
     -- Big table on the top all of them
 CREATE TABLE IF NOT EXISTS track_messages_main_table (
@@ -370,7 +370,7 @@ CREATE TABLE IF NOT EXISTS game_form_messages_answered_counter (
     last_answered_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	FOREIGN KEY (random_string_identifier) REFERENCES game_form_messages_random_string(random_string_to_get_id_after_create)
 );
-
+   
 -- game form publishing control table
 CREATE TABLE IF NOT EXISTS game_form_messages_publishing_control (
     random_string_identifier VARCHAR(255) NOT NULL,
@@ -890,90 +890,93 @@ INSERT INTO anime_form_answered_messages_info (random_string_identifier, title_o
 
 
 
-    -- Users table:
+    -- Users tables:
     
-CREATE TABLE IF NOT EXISTS id_to_username (
-    user_id INT NOT NULL,
-    username VARCHAR(50) NOT NULL UNIQUE
-);
-
+-- users table which is main table:
 CREATE TABLE IF NOT EXISTS users (
     id INT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(50) NOT NULL UNIQUE,
-    name VARCHAR(50) NOT NULL,
-    surname VARCHAR(50) NOT NULL,
     email VARCHAR(100) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    sex VARCHAR(30) NOT NULL,
-    favorite_anime_girl VARCHAR(255),
-    last_login_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_account_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    last_login_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- users_info table to save user infos:
+CREATE TABLE IF NOT EXISTS users_info(
+    username VARCHAR(50) NOT NULL UNIQUE,
+    from_as_country VARCHAR(30) DEFAULT NULL,
+    name VARCHAR(50) DEFAULT NULL,
+    surname VARCHAR(50) DEFAULT NULL,
+	sex VARCHAR(30) DEFAULT NULL,
+    favorite_anime_girl VARCHAR(255) DEFAULT NULL,
+	FOREIGN KEY (username) REFERENCES users(username),
+	last_updated_users_info_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- UserSecurityModelQuestion table:
 CREATE TABLE IF NOT EXISTS user_security_model_question (
-    user_id INT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
     user_using_question BOOLEAN NOT NULL,
     security_question VARCHAR(255),
     security_answer VARCHAR(255),
-    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (username) REFERENCES users(username),
 	updated_question_security_model_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- UserSecurityModelNumber table:
 CREATE TABLE IF NOT EXISTS user_security_model_telephone_number (
-    user_id INT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
     user_using_number BOOLEAN NOT NULL,
     tel_number BIGINT,
-    FOREIGN KEY (user_id) REFERENCES users(id),
+	FOREIGN KEY (username) REFERENCES users(username),
 	updated_telephone_number_security_model_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- UserSecurityModelSavingMail table:
 CREATE TABLE IF NOT EXISTS user_security_model_saving_mail (
-    user_id INT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
     user_using_saving_mail BOOLEAN NOT NULL,
     extra_mail VARCHAR(100),
-    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (username) REFERENCES users(username),
 	updated_saving_mail_security_model_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- UserModelSocials table:
 CREATE TABLE IF NOT EXISTS user_model_socials (
-    user_id INT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
     facebook VARCHAR(255),
     twitter VARCHAR(255),
     instagram VARCHAR(255),
     linkedin VARCHAR(255),
     personal_website VARCHAR(255),
-    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (username) REFERENCES users(username),
 	updated_user_model_socials_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- Inserting data into 'users' table
-INSERT INTO users (username, name, surname, email, password_hash, sex, favorite_anime_girl)
-VALUES ('alice_smith', 'Alice', 'Smith', 'alice.smith@example.com', 'hashed_password_456', 'Female', 'Saber'),
-       ('bob_jones', 'Bob', 'Jones', 'bob.jones@example.com', 'hashed_password_789', 'Male', 'Rem'),
-       ('eva_williams', 'Eva', 'Williams', 'eva.williams@example.com', 'hashed_password_012', 'Female', 'Luffy');
+INSERT INTO users (username, email, password_hash)
+VALUES ('alice_smith', 'alice.smith@example.com', 'hashed_password_456'),
+       ('bob_jones', 'bob.jones@example.com', 'hashed_password_789'),
+       ('eva_williams', 'eva.williams@example.com', 'hashed_password_012');
 
 -- Inserting data into 'user_security_model_question' table
-INSERT INTO user_security_model_question (user_id, user_using_question, security_question, security_answer)
-VALUES (1, true, 'What is your favorite color?', 'Blue'),
-       (2, true, 'In which city were you born?', 'New York'),
-       (3, false, NULL, NULL);
+INSERT INTO user_security_model_question (username, user_using_question, security_question, security_answer)
+VALUES ('alice_smith', true, 'What is your favorite color?', 'Blue'),
+       ('bob_jones', true, 'In which city were you born?', 'New York'),
+       ('eva_williams', false, NULL, NULL);
 
 -- Inserting data into 'user_security_model_telephone_number' table
-INSERT INTO user_security_model_telephone_number (user_id, user_using_number, tel_number)
-VALUES (1, true, 5557782939),
-       (2, true, 5557782939),
-       (3, false, NULL);
+INSERT INTO user_security_model_telephone_number (username, user_using_number, tel_number)
+VALUES ('alice_smith', true, 5557782939),
+       ('bob_jones', true, 5557782939),
+       ('eva_williams', false, NULL);
 
 -- Inserting data into 'user_security_model_saving_mail' table
-INSERT INTO user_security_model_saving_mail (user_id, user_using_saving_mail, extra_mail)
-VALUES (1, true, 'backup_email@example.com'),
-       (2, false, NULL),
-       (3, true, 'secondary_email@example.com');
+INSERT INTO user_security_model_saving_mail (username, user_using_saving_mail, extra_mail)
+VALUES ('alice_smith', true, 'backup_email@example.com'),
+       ('bob_jones', false, NULL),
+       ('eva_williams', true, 'secondary_email@example.com');
 
 
 
@@ -982,8 +985,8 @@ VALUES (1, true, 'backup_email@example.com'),
 
 -- Inserting data into 'user_model_socials' table
 INSERT INTO user_model_socials (user_id, facebook, twitter, instagram, linkedin, personal_website)
-VALUES (1, 'facebook.com/alice', 'twitter.com/alice', 'instagram.com/alice', 'linkedin.com/in/alice', 'alice.com'),
-       (2, 'facebook.com/bob', 'twitter.com/bob', 'instagram.com/bob', 'linkedin.com/in/bob', 'bob.com'),
-       (3, NULL, NULL, NULL, NULL, NULL);
+VALUES ('alice_smith', 'facebook.com/alice', 'twitter.com/alice', 'instagram.com/alice', 'linkedin.com/in/alice', 'alice.com'),
+       ('bob_jones', 'facebook.com/bob', 'twitter.com/bob', 'instagram.com/bob', 'linkedin.com/in/bob', 'bob.com'),
+       ('eva_williams', NULL, NULL, NULL, NULL, NULL);
 
 SELECT * FROM users;
