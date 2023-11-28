@@ -54,7 +54,7 @@ async fn main() -> std::io::Result<()> {
     
     let mut form_handlebars = Handlebars::new();
     form_handlebars
-        .register_template_file("form_page_template", "static/templates/form_page_template.html")
+        .register_template_file("form_page_template", "static/templates/formpage_template.html")
         .unwrap();
     let form_handlebars_ref2 = web::Data::new(form_handlebars);
    
