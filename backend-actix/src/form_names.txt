@@ -3,3 +3,4 @@ manga
 books
 software
 games
+astrology

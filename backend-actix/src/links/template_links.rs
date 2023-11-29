@@ -1,50 +1,56 @@
-// /links/template_links.rs:
-
 use actix_web::{web, HttpResponse};
 use handlebars::Handlebars;
 use serde_json::json;
-use std::{path::Path, fs::File, io::{BufReader, BufRead, self}};
-
+use std::{fs::File, io::{self, BufReader, BufRead}, path::Path};
 
 pub async fn open_form_page(
     hb: web::Data<Handlebars<'_>>,
     path: web::Path<(String,)>,
 ) -> HttpResponse {
-    let form_name = path.0.clone();
+    let form_name = &path.0;
+    println!("Received form name: {}", form_name);
 
-    // Geçerli form adlarını kontrol et
-    if valid_form_name(&form_name) {
-        // Handlebars şablonunu oluşturacak veriyi hazırlayın
+    if valid_form_name(form_name) {
+        println!("Valid form name: {}", form_name);
+
         let data = json!({
             "form_name": form_name,
         });
 
-        // Handlebars ile şablonu render edin
-        let template_name = "form_page_template";
-        if let Some(body) = hb.render(template_name, &data).ok() {
-            // HTTP yanıtını oluşturun
+        if let Some(body) = hb.render("form_page_template", &data).ok() {
             return HttpResponse::Ok().content_type("text/html").body(body);
+        } else {
+            eprintln!("Failed to render template for form: {}", form_name);
         }
+    } else {
+        println!("Invalid form name: {}", form_name);
     }
 
-    // Geçersiz form adı veya şablon oluşturulamadıysa 404 hatası döndür
     HttpResponse::NotFound().finish()
 }
 
-// form_names.txt dosyasından form adlarını kontrol eden bir yardımcı fonksiyon
 fn valid_form_name(form_name: &str) -> bool {
     match read_form_names_from_file() {
         Ok(form_names) => form_names.contains(&form_name.to_string()),
-        Err(_) => false,
+        Err(err) => {
+            eprintln!("Error reading form names from file: {}", err);
+            false
+        }
     }
 }
 
-// form_names.txt dosyasından form adlarını okuyan bir yardımcı fonksiyon
 fn read_form_names_from_file() -> Result<Vec<String>, io::Error> {
     let file_path = "form_names.txt";
     let path = Path::new(&file_path);
 
-    let file = File::open(&path)?;
+    let file = match File::open(&path) {
+        Ok(file) => file,
+        Err(err) => {
+            eprintln!("Error opening file {}: {}", file_path, err);
+            return Err(err);
+        }
+    };
+
     let reader = BufReader::new(file);
 
     let form_names: Vec<String> = reader.lines().filter_map(|line| line.ok()).collect();

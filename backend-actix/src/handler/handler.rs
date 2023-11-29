@@ -53,7 +53,7 @@ async fn form_live_checker_handler() -> impl Responder {
 
 #[get("/anan")]
 async fn anan_handler() -> impl Responder {
-    const MESSAGE: &str = "Döne dolaşa buraya geldin, tebrikler.\nAma, ananın amı.";
+    const MESSAGE: &str = "Döne dolaşa buraya geldin, tebrikler, Ama ananın amı.";
 
     HttpResponse::Ok().json(json!({"status": "success","form_message": MESSAGE}))
 }
