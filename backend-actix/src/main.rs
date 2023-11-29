@@ -12,17 +12,12 @@ mod schema;
 mod handler;
 mod links;
 
-static _IS_THERE_ANY_GOD: bool =false;   
-
 pub struct AppState {
     db: MySqlPool,
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-
-    let i: &'static str = "orkun";
-    let orkun_text = i;
 
     if std::env::var_os("RUST_LOG").is_none() {
         std::env::set_var("RUST_LOG", "actix_web=info");
