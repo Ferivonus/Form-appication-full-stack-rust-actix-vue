@@ -2,5 +2,6 @@ anime
 manga
 books
 software
-games
+game
 astrology
+chatting

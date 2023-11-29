@@ -12,12 +12,17 @@ mod schema;
 mod handler;
 mod links;
 
+static _IS_THERE_ANY_GOD: bool =false;   
+
 pub struct AppState {
     db: MySqlPool,
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+
+    let i: &'static str = "orkun";
+    let orkun_text = i;
 
     if std::env::var_os("RUST_LOG").is_none() {
         std::env::set_var("RUST_LOG", "actix_web=info");
@@ -75,7 +80,11 @@ async fn main() -> std::io::Result<()> {
             .app_data(book_handlebars_ref.clone())
             .app_data(form_handlebars_ref2.clone())
             .app_data(web::Data::new(AppState { db: pool.clone() }))
-            .configure(handler::handler::config)
+            .configure(handler::handler::main_handler_config)
+            .configure(handler::user_handler::user_handler_config)
+            .configure(handler::form_handler::form_handler_config)
+            .configure(handler::create_form_handler::create_form_handler_config)
+
             .wrap(cors)
             .wrap(Logger::default())
             .route("/bookpage", web::get().to(links::book_page))

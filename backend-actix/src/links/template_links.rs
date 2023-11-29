@@ -23,7 +23,7 @@ pub async fn open_form_page(
             eprintln!("Failed to render template for form: {}", form_name);
         }
     } else {
-        println!("Invalid form name: {}", form_name);
+        eprintln!("Invalid form name: {}", form_name);
     }
 
     HttpResponse::NotFound().finish()
@@ -33,14 +33,14 @@ fn valid_form_name(form_name: &str) -> bool {
     match read_form_names_from_file() {
         Ok(form_names) => form_names.contains(&form_name.to_string()),
         Err(err) => {
-            eprintln!("Error reading form names from file: {}", err);
+            eprintln!("Error reading form names from file {}: {}", get_file_path(), err);
             false
         }
     }
 }
 
 fn read_form_names_from_file() -> Result<Vec<String>, io::Error> {
-    let file_path = "form_names.txt";
+    let file_path = get_file_path();
     let path = Path::new(&file_path);
 
     let file = match File::open(&path) {
@@ -56,6 +56,10 @@ fn read_form_names_from_file() -> Result<Vec<String>, io::Error> {
     let form_names: Vec<String> = reader.lines().filter_map(|line| line.ok()).collect();
 
     Ok(form_names)
+}
+
+fn get_file_path() -> &'static str {
+    "form_names.txt"
 }
 
 pub fn form_page_template_config(cfg: &mut web::ServiceConfig) {
