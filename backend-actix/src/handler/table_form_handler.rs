@@ -1,15 +1,18 @@
 // src/handlers.rs: 
 use crate::AppState;
 
-
-use actix_web::{delete, get, put ,patch, post, web, HttpResponse, Responder};
+use actix_web::{delete, post, web, HttpResponse, Responder};
 use serde_json::json;
 use sqlx::MySql;
 
+use std::fs::OpenOptions;
+use std::io::{self, BufRead, BufReader, BufWriter, Write};
+
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
-pub struct  CreateFormSchema{
+pub struct CreateFormSchema {
     pub form_title: Option<String>,
     pub user_secret_string_id: Option<String>,
+    pub user_name: Option<String>,  
 }
 
 #[post("/form/create/all_users/")]
@@ -17,8 +20,18 @@ async fn create_form_and_tables_handler(
     body: web::Json<CreateFormSchema>,
     data: web::Data<AppState>,
 ) -> impl Responder {
+
     let form_title = body.form_title.to_owned().unwrap_or_default();
-    // let user_secret_string_id = body.user_secret_string_id.to_owned().unwrap_or_default();
+    let user_secret_string_id = body.user_secret_string_id.to_owned().unwrap_or_default();
+    let user_name = body.user_name.to_owned().unwrap_or_default();
+
+
+    // Update the form_names.txt file
+    if let Err(err) = add_new_form_entry(&data, &user_secret_string_id, &user_name, &form_title).await {
+        eprintln!("Error updating form_names.txt: {}", err);
+        // Handle the error as needed
+        return HttpResponse::InternalServerError().finish(); // Return an internal server error response
+    }
 
     // Create chatting_form_messages_random_string table
     let create_random_string_table_query = format!(
@@ -113,7 +126,7 @@ async fn create_form_and_tables_handler(
         .await
         .map_err(|err| err.to_string());
 
-    // create chatting image informations
+    // create chatting image information
     let create_form_messages_image_counter = format!(
         r#"CREATE TABLE IF NOT EXISTS {}_form_messages_image_information (
             random_string_identifier VARCHAR(255) NOT NULL, -- to understand which message is it.
@@ -146,9 +159,9 @@ async fn create_form_and_tables_handler(
     .await
     .map_err(|err| err.to_string());
 
-    // Create chatting_form_messages_image_like_dislake_founded_funny table
+    // Create chatting_form_messages_image_like_dislike_founded_funny table
     let create_image_like_dislike_funny_table_query = format!(
-        r#"CREATE TABLE IF NOT EXISTS {}_form_messages_image_like_dislake_founded_funny (
+        r#"CREATE TABLE IF NOT EXISTS {}_form_messages_image_like_dislike_founded_funny (
             random_string_identifier VARCHAR(255) NOT NULL,
             image_liked_count INT NOT NULL DEFAULT 0,
             image_disliked_count INT NOT NULL DEFAULT 0,
@@ -161,11 +174,11 @@ async fn create_form_and_tables_handler(
     let _query_result9 = sqlx::query(&create_image_like_dislike_funny_table_query)
     .execute(&data.db)
     .await
-    .map_err(|err| err.to_string());
+    .map_err(|err: sqlx::Error| err.to_string());
 
-    // Create chatting_form_messages_like_dislake_information table
+    // Create chatting_form_messages_like_dislike_information table
     let create_like_dislike_information_table_query = format!(
-        r#"CREATE TABLE IF NOT EXISTS {}_form_messages_like_dislake_information (
+        r#"CREATE TABLE IF NOT EXISTS {}_form_messages_like_dislike_information (
             random_string_identifier VARCHAR(255) NOT NULL,
             liked_count INT NOT NULL DEFAULT 0,
             disliked_count INT NOT NULL DEFAULT 0,
@@ -251,6 +264,55 @@ async fn create_form_and_tables_handler(
 }
 
 
+async fn add_new_form_entry(
+    _data: &web::Data<AppState>,
+    user_secret_string_id: &str,
+    user_name: &str,
+    form_name: &str,
+) -> Result<(), io::Error> {
+    // Open form_names.txt in read-only mode to check if the form already exists
+    let path = "form_names.txt";
+    let file = match OpenOptions::new().read(true).open(path) {
+        Ok(file) => file,
+        Err(err) => {
+            eprintln!("Error opening file {}: {}", path, err);
+            return Err(err);
+        }
+    };
+
+    let reader = BufReader::new(file);
+
+    // Check if the form_name already exists in the file
+    let form_exists = reader.lines().any(|line| {
+        if let Ok(line) = line {
+            let parts: Vec<&str> = line.split_whitespace().collect();
+            parts.len() == 3 && parts[2] == form_name
+        } else {
+            false
+        }
+    });
+
+    if form_exists {
+        // Form already exists, handle the error
+        eprintln!("Error: Form already exists");
+        return Err(io::Error::new(io::ErrorKind::Other, "Form already exists"));
+    }
+
+    // Open form_names.txt in append mode
+    let file = OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(path)?;
+
+    // Append the new entry to the file
+    let mut file = BufWriter::new(file);
+    writeln!(file, "{} {} {}", user_secret_string_id, user_name, form_name)?;
+
+    Ok(())
+}
+
+
+
 #[derive(serde::Deserialize, Debug, sqlx::FromRow)]
 pub struct  DropFormTablesRequest{
     pub form_title: String,
@@ -309,6 +371,13 @@ async fn drop_form_tables_handler(
             // Call the function to drop tables
             drop_tables(&form_title, &data.db).await;
 
+            // Delete form information from form_names.txt
+            if let Err(err) = delete_form_info_from_txt(&data, form_title).await {
+                eprintln!("Error deleting form info from form_names.txt: {}", err);
+                // Handle the error as needed
+                return HttpResponse::InternalServerError().finish(); // Return an internal server error response
+            }
+
             let sql_update_query = "\
                 UPDATE admin_authentication_table_for_drop_form \
                 SET used_time = used_time + 1 \
@@ -335,6 +404,50 @@ async fn drop_form_tables_handler(
         }
     }
 
+}
+
+async fn delete_form_info_from_txt(
+    _data: &web::Data<AppState>,
+    form_title: &str,
+) -> Result<(), io::Error> {
+    let path = "form_names.txt";
+
+    // Read all lines from form_names.txt, excluding the line with the specified form_title
+    let lines: Vec<String> = {
+        let file = match OpenOptions::new().read(true).open(path) {
+            Ok(file) => file,
+            Err(err) => {
+                eprintln!("Error opening file {}: {}", path, err);
+                return Err(err);
+            }
+        };
+
+        let reader = BufReader::new(file);
+
+        reader
+            .lines()
+            .filter_map(|line| line.ok())
+            .filter(|line| {
+                let parts: Vec<&str> = line.split_whitespace().collect();
+                parts.len() == 3 && parts[2] != form_title
+            })
+            .collect()
+    };
+
+    // Write the remaining lines back to form_names.txt
+    let file = OpenOptions::new()
+        .write(true)
+        .truncate(true)
+        .create(true)
+        .open(path)?;
+
+    let mut file = BufWriter::new(file);
+
+    for line in lines {
+        writeln!(file, "{}", line)?;
+    }
+
+    Ok(())
 }
 
 async fn drop_tables(form_title: &str, db: &sqlx::MySqlPool) {
@@ -404,7 +517,7 @@ async fn drop_tables(form_title: &str, db: &sqlx::MySqlPool) {
         .map_err(|err| eprintln!("Error dropping image how many times answered table: {}", err));
 
     let drop_image_like_dislike_funny_table_query = format!(
-        "DROP TABLE IF EXISTS {}_form_messages_image_like_dislake_founded_funny",
+        "DROP TABLE IF EXISTS {}_form_messages_image_like_dislike_founded_funny",
         &form_title
     );
     let _ = sqlx::query(&drop_image_like_dislike_funny_table_query)
@@ -413,7 +526,7 @@ async fn drop_tables(form_title: &str, db: &sqlx::MySqlPool) {
         .map_err(|err| eprintln!("Error dropping image like dislike funny table: {}", err));
 
     let drop_like_dislike_information_table_query = format!(
-        "DROP TABLE IF EXISTS {}_form_messages_like_dislake_information",
+        "DROP TABLE IF EXISTS {}_form_messages_like_dislike_information",
         &form_title
     );
     let _ = sqlx::query(&drop_like_dislike_information_table_query)
@@ -452,6 +565,7 @@ async fn drop_tables(form_title: &str, db: &sqlx::MySqlPool) {
 
 pub fn table_form_handler_config(conf: &mut web::ServiceConfig) {
     let scope = web::scope("/api")
-        .service(create_form_and_tables_handler);
+        .service(create_form_and_tables_handler)
+        .service(drop_form_tables_handler);
     conf.service(scope);
 }

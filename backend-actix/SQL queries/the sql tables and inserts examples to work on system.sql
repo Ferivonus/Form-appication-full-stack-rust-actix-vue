@@ -1,5 +1,6 @@
 
 	-- Chatting form drop tables:
+DROP TABLE IF EXISTS chatting_form_messages_answered_counter;
 DROP TABLE IF EXISTS chatting_form_messages_publishing_control;
 DROP TABLE IF EXISTS chatting_form_messages_message_info;
 DROP TABLE IF EXISTS chatting_form_messages_has_image_information;
@@ -7,8 +8,8 @@ DROP TABLE IF EXISTS chatting_form_messages_image_counter;
 DROP TABLE IF EXISTS chatting_form_messages_image_information;
 DROP TABLE IF EXISTS chatting_form_messages_image_time_infos;
 DROP TABLE IF EXISTS chatting_form_messages_image_how_many_times_answered;
-DROP TABLE IF EXISTS chatting_form_messages_image_like_dislake_founded_funny;
-DROP TABLE IF EXISTS chatting_form_messages_like_dislake_information;
+DROP TABLE IF EXISTS chatting_form_messages_image_like_dislike_founded_funny;
+DROP TABLE IF EXISTS chatting_form_messages_like_dislike_information;
 DROP TABLE IF EXISTS chatting_form_messages_message_time_info;
 DROP TABLE IF EXISTS chatting_form_messages_answered_to_node;
 DROP TABLE IF EXISTS chatting_form_answered_messages_info;
@@ -23,8 +24,8 @@ DROP TABLE IF EXISTS astrology_form_messages_image_counter;
 DROP TABLE IF EXISTS astrology_form_messages_image_information;
 DROP TABLE IF EXISTS astrology_form_messages_image_time_infos;
 DROP TABLE IF EXISTS astrology_form_messages_image_how_many_times_answered;
-DROP TABLE IF EXISTS astrology_form_messages_image_like_dislake_founded_funny;
-DROP TABLE IF EXISTS astrology_form_messages_like_dislake_information;
+DROP TABLE IF EXISTS astrology_form_messages_image_like_dislike_founded_funny;
+DROP TABLE IF EXISTS astrology_form_messages_like_dislike_information;
 DROP TABLE IF EXISTS astrology_form_messages_message_time_info;
 DROP TABLE IF EXISTS astrology_form_messages_answered_to_node;
 DROP TABLE IF EXISTS astrology_form_answered_messages_info;
@@ -40,8 +41,8 @@ DROP TABLE IF EXISTS game_form_messages_image_counter;
 DROP TABLE IF EXISTS game_form_messages_image_information;
 DROP TABLE IF EXISTS game_form_messages_image_time_infos;
 DROP TABLE IF EXISTS game_form_messages_image_how_many_times_answered;
-DROP TABLE IF EXISTS game_form_messages_image_like_dislake_founded_funny;
-DROP TABLE IF EXISTS game_form_messages_like_dislake_information;
+DROP TABLE IF EXISTS game_form_messages_image_like_dislike_founded_funny;
+DROP TABLE IF EXISTS game_form_messages_like_dislike_information;
 DROP TABLE IF EXISTS game_form_messages_message_time_info;
 DROP TABLE IF EXISTS game_form_messages_answered_to_node;
 DROP TABLE IF EXISTS game_form_answered_messages_info;
@@ -58,8 +59,8 @@ DROP TABLE IF EXISTS sport_form_messages_image_counter;
 DROP TABLE IF EXISTS sport_form_messages_image_information;
 DROP TABLE IF EXISTS sport_form_messages_image_time_infos;
 DROP TABLE IF EXISTS sport_form_messages_image_how_many_times_answered;
-DROP TABLE IF EXISTS sport_form_messages_image_like_dislake_founded_funny;
-DROP TABLE IF EXISTS sport_form_messages_like_dislake_information;
+DROP TABLE IF EXISTS sport_form_messages_image_like_dislike_founded_funny;
+DROP TABLE IF EXISTS sport_form_messages_like_dislike_information;
 DROP TABLE IF EXISTS sport_form_messages_message_time_info;
 DROP TABLE IF EXISTS sport_form_messages_answered_to_node;
 DROP TABLE IF EXISTS sport_form_answered_messages_info;
@@ -75,8 +76,8 @@ DROP TABLE IF EXISTS software_form_messages_image_counter;
 DROP TABLE IF EXISTS software_form_messages_image_information;
 DROP TABLE IF EXISTS software_form_messages_image_time_infos;
 DROP TABLE IF EXISTS software_form_messages_image_how_many_times_answered;
-DROP TABLE IF EXISTS software_form_messages_image_like_dislake_founded_funny;
-DROP TABLE IF EXISTS software_form_messages_like_dislake_information;
+DROP TABLE IF EXISTS software_form_messages_image_like_dislike_founded_funny;
+DROP TABLE IF EXISTS software_form_messages_like_dislike_information;
 DROP TABLE IF EXISTS software_form_messages_message_time_info;
 DROP TABLE IF EXISTS software_form_messages_answered_to_node;
 DROP TABLE IF EXISTS software_form_answered_messages_info;
@@ -92,8 +93,8 @@ DROP TABLE IF EXISTS anime_form_messages_image_counter;
 DROP TABLE IF EXISTS anime_form_messages_image_information;
 DROP TABLE IF EXISTS anime_form_messages_image_time_infos;
 DROP TABLE IF EXISTS anime_form_messages_image_how_many_times_answered;
-DROP TABLE IF EXISTS anime_form_messages_image_like_dislake_founded_funny;
-DROP TABLE IF EXISTS anime_form_messages_like_dislake_information;
+DROP TABLE IF EXISTS anime_form_messages_image_like_dislike_founded_funny;
+DROP TABLE IF EXISTS anime_form_messages_like_dislike_information;
 DROP TABLE IF EXISTS anime_form_messages_message_time_info;
 DROP TABLE IF EXISTS anime_form_messages_answered_to_node;
 DROP TABLE IF EXISTS anime_form_answered_messages_info;
@@ -209,20 +210,20 @@ CREATE TABLE IF NOT EXISTS chatting_form_messages_image_how_many_times_answered 
 	FOREIGN KEY (random_string_identifier) REFERENCES chatting_form_messages_random_string(random_string_to_get_id_after_create)
 );
 
--- chatting image like and dislake counter
-CREATE TABLE IF NOT EXISTS chatting_form_messages_image_like_dislake_founded_funny (
+-- chatting image like and dislike counter
+CREATE TABLE IF NOT EXISTS chatting_form_messages_image_like_dislike_founded_funny (
 	random_string_identifier VARCHAR(255) NOT NULL, -- to understand which message is it.
 	image_liked_count INT NOT NULL DEFAULT 0, -- how many times answered info
-	image_dislaked_count INT NOT NULL DEFAULT 0, -- how many times answered info
+	image_disliked_count INT NOT NULL DEFAULT 0, -- how many times answered info
 	image_founded_funny_count INT NOT NULL DEFAULT 0, -- how many times answered info    
 	FOREIGN KEY (random_string_identifier) REFERENCES chatting_form_messages_random_string(random_string_to_get_id_after_create)
 );
 
--- chatting message like and dislake counter
-CREATE TABLE IF NOT EXISTS chatting_form_messages_like_dislake_information (
+-- chatting message like and dislike counter
+CREATE TABLE IF NOT EXISTS chatting_form_messages_like_dislike_information (
 	random_string_identifier VARCHAR(255) NOT NULL, -- to understand which message is it.
 	liked_count INT NOT NULL DEFAULT 0, -- how many times liked info
-	dislaked_count INT NOT NULL DEFAULT 0, -- how many times unliked info
+	disliked_count INT NOT NULL DEFAULT 0, -- how many times unliked info
     founded_funny INT NOT NULL DEFAULT 0, -- how many times founded funny info
 	FOREIGN KEY (random_string_identifier) REFERENCES chatting_form_messages_random_string(random_string_to_get_id_after_create)
 );
@@ -326,20 +327,20 @@ CREATE TABLE IF NOT EXISTS astrology_form_messages_image_how_many_times_answered
 	FOREIGN KEY (random_string_identifier) REFERENCES astrology_form_messages_random_string(random_string_to_get_id_after_create)
 );
 
--- astrology image like and dislake counter
-CREATE TABLE IF NOT EXISTS astrology_form_messages_image_like_dislake_founded_funny (
+-- astrology image like and dislike counter
+CREATE TABLE IF NOT EXISTS astrology_form_messages_image_like_dislike_founded_funny (
 	random_string_identifier VARCHAR(255) NOT NULL, -- to understand which message is it.
 	image_liked_count INT NOT NULL DEFAULT 0, -- how many times answered info
-	image_dislaked_count INT NOT NULL DEFAULT 0, -- how many times answered info
+	image_disliked_count INT NOT NULL DEFAULT 0, -- how many times answered info
 	image_founded_funny_count INT NOT NULL DEFAULT 0, -- how many times answered info    
 	FOREIGN KEY (random_string_identifier) REFERENCES astrology_form_messages_random_string(random_string_to_get_id_after_create)
 );
 
--- astrology message like and dislake counter
-CREATE TABLE IF NOT EXISTS astrology_form_messages_like_dislake_information (
+-- astrology message like and dislike counter
+CREATE TABLE IF NOT EXISTS astrology_form_messages_like_dislike_information (
 	random_string_identifier VARCHAR(255) NOT NULL, -- to understand which message is it.
 	liked_count INT NOT NULL DEFAULT 0, -- how many times answered info
-	dislaked_count INT NOT NULL DEFAULT 0, -- how many times answered info
+	disliked_count INT NOT NULL DEFAULT 0, -- how many times answered info
 	founded_funny INT NOT NULL DEFAULT 0, -- how many times founded funny info
 	FOREIGN KEY (random_string_identifier) REFERENCES astrology_form_messages_random_string(random_string_to_get_id_after_create)
 );
@@ -443,20 +444,20 @@ CREATE TABLE IF NOT EXISTS game_form_messages_image_how_many_times_answered (
 	FOREIGN KEY (random_string_identifier) REFERENCES game_form_messages_random_string(random_string_to_get_id_after_create)
 );
 
--- game image like and dislake counter
-CREATE TABLE IF NOT EXISTS game_form_messages_image_like_dislake_founded_funny (
+-- game image like and dislike counter
+CREATE TABLE IF NOT EXISTS game_form_messages_image_like_dislike_founded_funny (
 	random_string_identifier VARCHAR(255) NOT NULL, -- to understand which message is it.
 	image_liked_count INT NOT NULL DEFAULT 0, -- how many times answered info
-	image_dislaked_count INT NOT NULL DEFAULT 0, -- how many times answered info
+	image_disliked_count INT NOT NULL DEFAULT 0, -- how many times answered info
 	image_founded_funny_count INT NOT NULL DEFAULT 0, -- how many times answered info    
 	FOREIGN KEY (random_string_identifier) REFERENCES game_form_messages_random_string(random_string_to_get_id_after_create)
 );
 
--- game message like and dislake counter
-CREATE TABLE IF NOT EXISTS game_form_messages_like_dislake_information (
+-- game message like and dislike counter
+CREATE TABLE IF NOT EXISTS game_form_messages_like_dislike_information (
 	random_string_identifier VARCHAR(255) NOT NULL, -- to understand which message is it.
 	liked_count INT NOT NULL DEFAULT 0, -- how many times answered info
-	dislaked_count INT NOT NULL DEFAULT 0, -- how many times answered info
+	disliked_count INT NOT NULL DEFAULT 0, -- how many times answered info
     founded_funny INT NOT NULL DEFAULT 0, -- how many times founded funny info
 	FOREIGN KEY (random_string_identifier) REFERENCES game_form_messages_random_string(random_string_to_get_id_after_create)
 );
@@ -560,20 +561,20 @@ CREATE TABLE IF NOT EXISTS sport_form_messages_image_how_many_times_answered (
 	FOREIGN KEY (random_string_identifier) REFERENCES sport_form_messages_random_string(random_string_to_get_id_after_create)
 );
 
--- sport image like and dislake counter
-CREATE TABLE IF NOT EXISTS sport_form_messages_image_like_dislake_founded_funny (
+-- sport image like and dislike counter
+CREATE TABLE IF NOT EXISTS sport_form_messages_image_like_dislike_founded_funny (
 	random_string_identifier VARCHAR(255) NOT NULL, -- to understand which message is it.
 	image_liked_count INT NOT NULL DEFAULT 0, -- how many times answered info
-	image_dislaked_count INT NOT NULL DEFAULT 0, -- how many times answered info
+	image_disliked_count INT NOT NULL DEFAULT 0, -- how many times answered info
 	image_founded_funny_count INT NOT NULL DEFAULT 0, -- how many times answered info    
 	FOREIGN KEY (random_string_identifier) REFERENCES sport_form_messages_random_string(random_string_to_get_id_after_create)
 );
 
--- sport message like and dislake counter
-CREATE TABLE IF NOT EXISTS sport_form_messages_like_dislake_information (
+-- sport message like and dislike counter
+CREATE TABLE IF NOT EXISTS sport_form_messages_like_dislike_information (
 	random_string_identifier VARCHAR(255) NOT NULL, -- to understand which message is it.
 	liked_count INT NOT NULL DEFAULT 0, -- how many times answered info
-	dislaked_count INT NOT NULL DEFAULT 0, -- how many times answered info
+	disliked_count INT NOT NULL DEFAULT 0, -- how many times answered info
     founded_funny INT NOT NULL DEFAULT 0, -- how many times founded funny info
 	FOREIGN KEY (random_string_identifier) REFERENCES sport_form_messages_random_string(random_string_to_get_id_after_create)
 );
@@ -676,20 +677,20 @@ CREATE TABLE IF NOT EXISTS software_form_messages_image_how_many_times_answered 
 	FOREIGN KEY (random_string_identifier) REFERENCES software_form_messages_random_string(random_string_to_get_id_after_create)
 );
 
--- software image like and dislake counter
-CREATE TABLE IF NOT EXISTS software_form_messages_image_like_dislake_founded_funny (
+-- software image like and dislike counter
+CREATE TABLE IF NOT EXISTS software_form_messages_image_like_dislike_founded_funny (
 	random_string_identifier VARCHAR(255) NOT NULL, -- to understand which message is it.
 	image_liked_count INT NOT NULL DEFAULT 0, -- how many times answered info
-	image_dislaked_count INT NOT NULL DEFAULT 0, -- how many times answered info
+	image_disliked_count INT NOT NULL DEFAULT 0, -- how many times answered info
 	image_founded_funny_count INT NOT NULL DEFAULT 0, -- how many times answered info    
 	FOREIGN KEY (random_string_identifier) REFERENCES software_form_messages_random_string(random_string_to_get_id_after_create)
 );
 
--- software message like and dislake counter
-CREATE TABLE IF NOT EXISTS software_form_messages_like_dislake_information (
+-- software message like and dislike counter
+CREATE TABLE IF NOT EXISTS software_form_messages_like_dislike_information (
 	random_string_identifier VARCHAR(255) NOT NULL, -- to understand which message is it.
 	liked_count INT NOT NULL DEFAULT 0, -- how many times answered info
-	dislaked_count INT NOT NULL DEFAULT 0, -- how many times answered info
+	disliked_count INT NOT NULL DEFAULT 0, -- how many times answered info
     founded_funny INT NOT NULL DEFAULT 0, -- how many times founded funny info
 	FOREIGN KEY (random_string_identifier) REFERENCES software_form_messages_random_string(random_string_to_get_id_after_create)
 );
@@ -792,20 +793,20 @@ CREATE TABLE IF NOT EXISTS anime_form_messages_image_how_many_times_answered (
 	FOREIGN KEY (random_string_identifier) REFERENCES anime_form_messages_random_string(random_string_to_get_id_after_create)
 );
 
--- anime image like and dislake counter
-CREATE TABLE IF NOT EXISTS anime_form_messages_image_like_dislake_founded_funny (
+-- anime image like and dislike counter
+CREATE TABLE IF NOT EXISTS anime_form_messages_image_like_dislike_founded_funny (
 	random_string_identifier VARCHAR(255) NOT NULL, -- to understand which message is it.
 	image_liked_count INT NOT NULL DEFAULT 0, -- how many times answered info
-	image_dislaked_count INT NOT NULL DEFAULT 0, -- how many times answered info
+	image_disliked_count INT NOT NULL DEFAULT 0, -- how many times answered info
 	image_founded_funny_count INT NOT NULL DEFAULT 0, -- how many times answered info    
 	FOREIGN KEY (random_string_identifier) REFERENCES anime_form_messages_random_string(random_string_to_get_id_after_create)
 );
 
--- anime message like and dislake counter
-CREATE TABLE IF NOT EXISTS anime_form_messages_like_dislake_information (
+-- anime message like and dislike counter
+CREATE TABLE IF NOT EXISTS anime_form_messages_like_dislike_information (
 	random_string_identifier VARCHAR(255) NOT NULL, -- to understand which message is it.
 	liked_count INT NOT NULL DEFAULT 0, -- how many times answered info
-	dislaked_count INT NOT NULL DEFAULT 0, -- how many times answered info
+	disliked_count INT NOT NULL DEFAULT 0, -- how many times answered info
     founded_funny INT NOT NULL DEFAULT 0, -- how many times founded funny info
 	FOREIGN KEY (random_string_identifier) REFERENCES anime_form_messages_random_string(random_string_to_get_id_after_create)
 );
@@ -872,7 +873,7 @@ INSERT INTO anime_form_messages_has_image_information ( random_String_identifier
 INSERT INTO anime_form_messages_publishing_control (random_string_identifier, published) VALUES ('şifreli_mesaj_1', TRUE);
 
 -- Setting defaults.
-INSERT INTO anime_form_messages_like_dislake_information (random_string_identifier) VALUES ('şifreli_mesaj_1');
+INSERT INTO anime_form_messages_like_dislike_information (random_string_identifier) VALUES ('şifreli_mesaj_1');
 INSERT INTO anime_form_messages_answered_counter (random_string_identifier) VALUES ('şifreli_mesaj_1');
 
 
@@ -888,13 +889,13 @@ INSERT INTO anime_form_messages_has_image_information ( random_String_identifier
 INSERT INTO anime_form_messages_publishing_control (random_string_identifier, published) VALUES ('şifreli_mesaj_2', TRUE);
 
 -- Setting defaults.
-INSERT INTO anime_form_messages_like_dislake_information (random_string_identifier) VALUES ('şifreli_mesaj_2');
+INSERT INTO anime_form_messages_like_dislike_information (random_string_identifier) VALUES ('şifreli_mesaj_2');
 INSERT INTO anime_form_messages_answered_counter (random_string_identifier) VALUES ('şifreli_mesaj_2');
 
 -- update main message to set a new answered
 UPDATE anime_form_messages_answered_counter SET answered_count = answered_count + 1 WHERE random_string_identifier = 'şifreli_mesaj_1';
 -- update main message to set founded funny 
-UPDATE anime_form_messages_like_dislake_information SET founded_funny = founded_funny + 1 WHERE random_string_identifier = 'şifreli_mesaj_1';
+UPDATE anime_form_messages_like_dislike_information SET founded_funny = founded_funny + 1 WHERE random_string_identifier = 'şifreli_mesaj_1';
 
 -- Connecting with answered message:
 

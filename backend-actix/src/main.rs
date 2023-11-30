@@ -47,14 +47,14 @@ async fn main() -> std::io::Result<()> {
 
     let mut book_handlebars = Handlebars::new();
     book_handlebars
-        .register_template_file("bookpage_template", "static/templates/bookpage_template.html")
+        .register_template_file("book_page_template", "static/templates/book_page_template.html")
         .unwrap();
     let book_handlebars_ref = web::Data::new(book_handlebars);
     
     
     let mut form_handlebars = Handlebars::new();
     form_handlebars
-        .register_template_file("form_page_template", "static/templates/formpage_template.html")
+        .register_template_file("form_page_template", "static/templates/form_page_template.html")
         .unwrap();
     let form_handlebars_ref2 = web::Data::new(form_handlebars);
    
