@@ -4,6 +4,7 @@ use sqlx::FromRow;
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct UserModel {
     pub id: i32,
+    pub user_token: String,
     pub username: String,
     pub email: String,
     pub password_hash: String,

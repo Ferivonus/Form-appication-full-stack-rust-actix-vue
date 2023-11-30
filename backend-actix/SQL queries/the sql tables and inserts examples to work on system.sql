@@ -110,6 +110,19 @@ DROP TABLE IF EXISTS user_security_model_saving_mail;
 DROP TABLE IF EXISTS user_model_socials; 
 DROP TABLE IF EXISTS users_info;
 DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS admin_authentication_table_for_drop_form;
+
+
+CREATE TABLE IF NOT EXISTS admin_authentication_table_for_drop_form (
+    id INT AUTO_INCREMENT NOT NULL,
+    admin_name VARCHAR(30) NOT NULL UNIQUE,
+    admin_password VARCHAR(30) NOT NULL,
+    admin_secret_key VARCHAR(30) NOT NULL,
+    gotten_token_from_main_admin VARCHAR(255) NOT NULL,
+    used_time INT DEFAULT 0,
+    PRIMARY KEY (id),
+    last_used_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
 
 
     -- Big table on the top all of them
@@ -895,7 +908,7 @@ INSERT INTO anime_form_answered_messages_info (random_string_identifier, title_o
 -- users table which is main table:
 CREATE TABLE IF NOT EXISTS users (
     id INT PRIMARY KEY AUTO_INCREMENT,
-	user_token VARCHAR(255) NOT NULL,
+	user_token VARCHAR(255) DEFAULT CURRENT_TIMESTAMP,
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,

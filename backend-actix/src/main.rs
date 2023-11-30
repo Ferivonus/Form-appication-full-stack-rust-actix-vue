@@ -78,7 +78,7 @@ async fn main() -> std::io::Result<()> {
             .configure(handler::handler::main_handler_config)
             .configure(handler::user_handler::user_handler_config)
             .configure(handler::form_handler::form_handler_config)
-            .configure(handler::create_form_handler::create_form_handler_config)
+            .configure(handler::table_form_handler::table_form_handler_config)
 
             .wrap(cors)
             .wrap(Logger::default())

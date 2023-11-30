@@ -4,6 +4,7 @@ use crate::AppState;
 
 use actix_web::{delete, get, put ,patch, post, web, HttpResponse, Responder};
 use serde_json::json;
+use sqlx::MySql;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 pub struct  CreateFormSchema{
@@ -250,7 +251,206 @@ async fn create_form_and_tables_handler(
 }
 
 
-pub fn create_form_handler_config(conf: &mut web::ServiceConfig) {
+#[derive(serde::Deserialize, Debug, sqlx::FromRow)]
+pub struct  DropFormTablesRequest{
+    pub form_title: String,
+    pub admin_name: String,
+    pub admin_password: String,
+    pub admin_secret_key: String,
+    pub getter_token_from_main_admin: String
+}
+
+use serde::{Serialize, Deserialize};
+
+#[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
+pub struct AdminUserModel {
+    pub id: i32,
+    pub admin_name: String,
+    pub admin_password: String,
+    pub admin_secret_key: String,
+    pub getter_token_from_main_admin: String,
+    pub used_time: i32,
+    pub last_answer_time: Option<chrono::NaiveDateTime>,
+}
+
+
+// Define the drop tables endpoint
+#[delete("/form/drop/admin/")]
+async fn drop_form_tables_handler(
+    body: web::Json<DropFormTablesRequest>,
+    data: web::Data<AppState>,
+) -> impl Responder {
+    // Extract values from the request body
+    let form_title = &body.form_title;
+    let admin_name = &body.admin_name;
+    let admin_password = &body.admin_password;
+    let admin_secret_key = &body.admin_secret_key;
+    let getter_token_from_main_admin = &body.getter_token_from_main_admin;
+
+    // Prepare the SQL query with placeholders to prevent SQL injection
+    let sql_query = "\
+        SELECT * FROM admin_authentication_table_for_drop_form \
+        WHERE admin_name = ? AND admin_password = ? AND admin_secret_key = ? AND gotten_token_from_main_admin = ?";
+
+    // Execute the query
+    let user: Result<Option<AdminUserModel>, _> = sqlx::query_as::<MySql, AdminUserModel>(&sql_query)
+        .bind(admin_name)
+        .bind(admin_password)
+        .bind(admin_secret_key)
+        .bind(getter_token_from_main_admin)
+        .fetch_optional(&data.db)
+        .await;
+
+
+    // Check if a user with the provided credentials exists
+    match user {
+        Ok(Some(_)) => {
+            // User found, proceed with dropping tables
+            // Call the function to drop tables
+            drop_tables(&form_title, &data.db).await;
+
+            let sql_update_query = "\
+                UPDATE admin_authentication_table_for_drop_form \
+                SET used_time = used_time + 1 \
+                WHERE admin_name = ?";
+
+            // Execute the update query
+            let _ = sqlx::query(&sql_update_query)
+                .bind(admin_name)
+                .execute(&data.db)
+                .await;
+
+            // Return success response
+            HttpResponse::Ok().json(json!({
+                "status": "success",
+                "message": "Tables dropped successfully"
+            }))
+        }
+        _ => {
+            // Invalid credentials or user not found
+            HttpResponse::Unauthorized().json(json!({
+                "status": "error",
+                "message": "Invalid credentials or user not found"
+            }))
+        }
+    }
+
+}
+
+async fn drop_tables(form_title: &str, db: &sqlx::MySqlPool) {
+
+    // Drop all the tables associated with the given form_title
+    let drop_publishing_control_table_query = format!(
+        "DROP TABLE IF EXISTS {}_form_messages_publishing_control",
+        &form_title
+    );
+    let _ = sqlx::query(&drop_publishing_control_table_query)
+        .execute(db)
+        .await
+        .map_err(|err| eprintln!("Error dropping publishing control table: {}", err));
+
+    let drop_message_info_table_query = format!(
+        "DROP TABLE IF EXISTS {}_form_messages_message_info",
+        &form_title
+    );
+    let _ = sqlx::query(&drop_message_info_table_query)
+        .execute(db)
+        .await
+        .map_err(|err| eprintln!("Error dropping message info table: {}", err));
+
+    let drop_has_image_info_table_query = format!(
+        "DROP TABLE IF EXISTS {}_form_messages_has_image_information",
+        &form_title
+    );
+    let _ = sqlx::query(&drop_has_image_info_table_query)
+        .execute(db)
+        .await
+        .map_err(|err| eprintln!("Error dropping has image info table: {}", err));
+
+    let drop_image_counter_table_query = format!(
+        "DROP TABLE IF EXISTS {}_form_messages_image_counter",
+        &form_title
+    );
+    let _ = sqlx::query(&drop_image_counter_table_query)
+        .execute(db)
+        .await
+        .map_err(|err| eprintln!("Error dropping image counter table: {}", err));
+
+    let drop_image_info_table_query = format!(
+        "DROP TABLE IF EXISTS {}_form_messages_image_information",
+        &form_title
+    );
+    let _ = sqlx::query(&drop_image_info_table_query)
+        .execute(db)
+        .await
+        .map_err(|err| eprintln!("Error dropping image info table: {}", err));
+
+    let drop_image_time_infos_table_query = format!(
+        "DROP TABLE IF EXISTS {}_form_messages_image_time_infos",
+        &form_title
+    );
+    let _ = sqlx::query(&drop_image_time_infos_table_query)
+        .execute(db)
+        .await
+        .map_err(|err| eprintln!("Error dropping image time infos table: {}", err));
+
+    let drop_image_how_many_times_answered_table_query = format!(
+        "DROP TABLE IF EXISTS {}_form_messages_image_how_many_times_answered",
+        &form_title
+    );
+    let _ = sqlx::query(&drop_image_how_many_times_answered_table_query)
+        .execute(db)
+        .await
+        .map_err(|err| eprintln!("Error dropping image how many times answered table: {}", err));
+
+    let drop_image_like_dislike_funny_table_query = format!(
+        "DROP TABLE IF EXISTS {}_form_messages_image_like_dislake_founded_funny",
+        &form_title
+    );
+    let _ = sqlx::query(&drop_image_like_dislike_funny_table_query)
+        .execute(db)
+        .await
+        .map_err(|err| eprintln!("Error dropping image like dislike funny table: {}", err));
+
+    let drop_like_dislike_information_table_query = format!(
+        "DROP TABLE IF EXISTS {}_form_messages_like_dislake_information",
+        &form_title
+    );
+    let _ = sqlx::query(&drop_like_dislike_information_table_query)
+        .execute(db)
+        .await
+        .map_err(|err| eprintln!("Error dropping like dislike information table: {}", err));
+
+    let drop_message_time_info_table_query = format!(
+        "DROP TABLE IF EXISTS {}_form_messages_message_time_info",
+        &form_title
+    );
+    let _ = sqlx::query(&drop_message_time_info_table_query)
+        .execute(db)
+        .await
+        .map_err(|err| eprintln!("Error dropping message time info table: {}", err));
+
+    let drop_answered_to_node_table_query = format!(
+        "DROP TABLE IF EXISTS {}_form_messages_answered_to_node",
+        &form_title
+    );
+    let _ = sqlx::query(&drop_answered_to_node_table_query)
+        .execute(db)
+        .await
+        .map_err(|err| eprintln!("Error dropping answered to node table: {}", err));
+
+    let drop_answered_messages_info_table_query = format!(
+        "DROP TABLE IF EXISTS {}_form_answered_messages_info",
+        &form_title
+    );
+    let _ = sqlx::query(&drop_answered_messages_info_table_query)
+        .execute(db)
+        .await
+        .map_err(|err| eprintln!("Error dropping answered messages info table: {}", err));
+    
+}
+
+pub fn table_form_handler_config(conf: &mut web::ServiceConfig) {
     let scope = web::scope("/api")
         .service(create_form_and_tables_handler);
     conf.service(scope);
