@@ -908,7 +908,7 @@ INSERT INTO anime_form_answered_messages_info (random_string_identifier, title_o
 -- users table which is main table:
 CREATE TABLE IF NOT EXISTS users (
     id INT PRIMARY KEY AUTO_INCREMENT,
-	user_token VARCHAR(255) DEFAULT CURRENT_TIMESTAMP,
+	user_token VARCHAR(255) NOT NULL UNIQUE,
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
@@ -969,10 +969,10 @@ CREATE TABLE IF NOT EXISTS user_model_socials (
 );
 
 -- Inserting data into 'users' table
-INSERT INTO users (username, email, password_hash)
-VALUES ('alice_smith', 'alice.smith@example.com', 'hashed_password_456'),
-       ('bob_jones', 'bob.jones@example.com', 'hashed_password_789'),
-       ('eva_williams', 'eva.williams@example.com', 'hashed_password_012');
+INSERT INTO users (user_token, username, email, password_hash)
+VALUES ('Token_1', 'alice_smith', 'alice.smith@example.com', 'hashed_password_456'),
+       ('Token_2', 'bob_jones', 'bob.jones@example.com', 'hashed_password_789'),
+       ('Token_3', 'eva_williams', 'eva.williams@example.com', 'hashed_password_012');
 
 -- Inserting data into 'user_security_model_question' table
 INSERT INTO user_security_model_question (username, user_using_question, security_question, security_answer)
