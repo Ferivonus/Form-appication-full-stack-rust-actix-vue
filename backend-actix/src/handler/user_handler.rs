@@ -14,12 +14,14 @@ use crate::{
     AppState,
 };
 
-use serde::Deserialize;
-use chrono::{ Utc, TimeZone};
+
+
+use chrono::{Utc, TimeZone};
 
 use actix_web::{delete, get, put ,patch, post, web, HttpResponse, Responder};
-use serde_json::json;
 use sqlx::{MySql, FromRow};
+
+
 
 #[post("/user/register/")]
 pub async fn add_user(
@@ -286,13 +288,13 @@ pub async fn get_user_by_email(
 
 
 #[derive(serde::Deserialize)]
-struct ChangePasswordRequest {
-    username: String,
-    current_password: String,
-    new_password: String,
+pub struct ChangePasswordRequest {
+    pub username: String,
+    pub current_password: String,
+    pub new_password: String,
 }
 
-#[put("/user/change-password/")]
+#[patch("/user/change-password/")]
 pub async fn change_password(
     payload: web::Json<ChangePasswordRequest>,
     data: web::Data<AppState>,

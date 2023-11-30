@@ -895,6 +895,7 @@ INSERT INTO anime_form_answered_messages_info (random_string_identifier, title_o
 -- users table which is main table:
 CREATE TABLE IF NOT EXISTS users (
     id INT PRIMARY KEY AUTO_INCREMENT,
+	user_token VARCHAR(255) NOT NULL,
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
