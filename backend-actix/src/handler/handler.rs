@@ -5,7 +5,7 @@ use crate::AppState;
 use serde::Deserialize;
 use chrono::{ Utc, TimeZone};
 
-use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
+use actix_web::{delete, get, put ,patch, post, web, HttpResponse, Responder};
 use serde_json::json;
 use sqlx::{MySql, FromRow};
 

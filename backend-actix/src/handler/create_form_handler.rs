@@ -2,7 +2,7 @@
 use crate::AppState;
 
 
-use actix_web::{post, web, HttpResponse, Responder};
+use actix_web::{delete, get, put ,patch, post, web, HttpResponse, Responder};
 use serde_json::json;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
