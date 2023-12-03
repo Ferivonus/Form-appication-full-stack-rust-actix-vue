@@ -1,5 +1,5 @@
 
-// src/handlers.rs: 
+// src/form_handler.rs: 
 use crate::{
     schema::{CreateMessageSchema, FilterAllMessagesOptions, FilterOnFormOptions},
     handler::models::form_models::{
@@ -32,7 +32,7 @@ use actix_web::{delete, get, put ,patch, post, web, HttpResponse, Responder};
 use serde_json::json;
 use sqlx::{MySql, FromRow};
 
-#[get("/messages")]
+#[get("/form/messages")]
 pub async fn every_message_handler(
     opts: web::Query<FilterAllMessagesOptions>,
     data: web::Data<AppState>,
@@ -68,7 +68,7 @@ pub async fn every_message_handler(
 }
 
 
-#[get("/messages/{form_name}")]
+#[get("/form/messages/{form_name}")]
 pub async fn form_message_list_by_form_name_handler(
     opts: web::Query<FilterOnFormOptions>,
     data: web::Data<AppState>,
@@ -88,7 +88,7 @@ pub async fn form_message_list_by_form_name_handler(
         }
     }
 
-    if !valid_form_name(&form_name_of_link) {
+    if !valid_form_name(data.clone(), &form_name_of_link).await {
         eprintln!("Invalid form name: {}", form_name_of_link);
         return HttpResponse::NotFound().finish();
     }
@@ -125,7 +125,26 @@ pub async fn form_message_list_by_form_name_handler(
     }
 }
 
-#[post("/messages/")]
+async fn valid_form_name(data: web::Data<AppState>, form_name: &String) -> bool {
+    let searching_data_query = format!(
+        "SELECT EXISTS(SELECT 1 FROM form_pages WHERE form_name = '{}') AS exists",
+        &form_name
+    );
+
+    let result: Result<bool, _> = sqlx::query_scalar(&searching_data_query)
+        .fetch_one(&data.db)
+        .await;
+
+    match result {
+        Ok(exists) => exists,
+        Err(err) => {
+            eprintln!("Error checking if form name exists: {}", err);
+            false
+        }
+    }
+}
+
+#[post("/form/messages/")]
 async fn add_message_handler(
     body: web::Json<CreateMessageSchema>,
     data: web::Data<AppState>,
@@ -186,6 +205,59 @@ async fn add_message_handler(
 
 
 
+#[delete("/form/delete-message")]
+pub async fn delete_message_handler(
+    opts: web::Json<FilterOnFormOptions>,
+    data: web::Data<AppState>,
+    path: web::Path<(String,)>,
+) -> impl Responder {
+
+    // Use the random_string_identifier from the query parameters or request body
+    //let random_string_identifier = opts.random_string_identifier.clone().unwrap_or_default();
+
+    // Your logic to delete the message based on random_string_identifier goes here
+    // Use SQL DELETE statement or your preferred method
+
+    let json_response = serde_json::json!({
+        "status": "success",
+        "message": "Message deleted successfully"
+    });
+
+    HttpResponse::Ok().json(json_response)
+}
+
+
+#[derive(Debug, Deserialize)]
+pub struct AnswerMessageSchema {
+    pub random_string_identifier: String,
+    pub user_token: String,
+    // Add other fields as needed for your answer schema
+}    
+    
+#[derive(Debug, Deserialize)]
+pub struct DelateMessageSchema {
+    pub random_string_identifier: String,
+    pub user_token: String,
+    // Add other fields as needed for your answer schema
+}
+
+#[post("/messages/answer")]
+async fn answer_to_message_handler(
+    data: web::Data<AppState>,
+    body: web::Json<AnswerMessageSchema>,
+) -> impl Responder {
+    // Your logic to handle answering a message goes here
+    // You can access the random_string_identifier using body.random_string_identifier
+    // Add necessary database queries and error handling
+
+    // Example response
+    HttpResponse::Ok().json(json!({
+        "status": "success",
+        "message": "Message answered successfully"
+    }))
+}
+
+
 fn filter_db_record(record: &MessageInfoModel) -> MessageInfoModelResponse {
     MessageInfoModelResponse {
             random_string_identifier: record.random_string_identifier.clone(),
@@ -198,11 +270,12 @@ fn filter_db_record(record: &MessageInfoModel) -> MessageInfoModelResponse {
 pub fn form_handler_config(conf: &mut web::ServiceConfig) {
     let scope = web::scope("/api")
 
-        .service(every_message_handler)
-        .service(add_message_handler)
-        .service(multiply)
-        .service(form_message_list_by_form_name_handler);
-
+    .service(every_message_handler)
+    .service(add_message_handler)
+    .service(form_message_list_by_form_name_handler)
+    .service(answer_to_message_handler)
+    .service(delete_message_handler)
+    .service(multiply);
     conf.service(scope);
 }
 
@@ -221,39 +294,4 @@ pub struct Nums {
 #[get("/multiply")]
 pub async fn multiply(nums: web::Query<Nums>) -> impl Responder {
     format!("Result: {}!", nums.first * nums.second)
-}
-
-use std::{fs::File, io::{self, BufReader, BufRead}, path::Path};
-
-fn valid_form_name(form_name: &str) -> bool {
-    match read_form_names_from_file() {
-        Ok(form_names) => form_names.contains(&form_name.to_string()),
-        Err(err) => {
-            eprintln!("Error reading form names from file: {}", err);
-            false
-        }
-    }
-}
-
-fn read_form_names_from_file() -> Result<Vec<String>, io::Error> {
-    let file_path = get_file_path();
-    let path = Path::new(&file_path);
-
-    let file = match File::open(&path) {
-        Ok(file) => file,
-        Err(err) => {
-            eprintln!("Error opening file {}: {}", file_path, err);
-            return Err(err);
-        }
-    };
-
-    let reader = BufReader::new(file);
-
-    let form_names: Vec<String> = reader.lines().filter_map(|line| line.ok()).collect();
-
-    Ok(form_names)
-}
-
-fn get_file_path() -> &'static str {
-    "form_names.txt"
 }

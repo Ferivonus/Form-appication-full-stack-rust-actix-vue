@@ -112,6 +112,29 @@ DROP TABLE IF EXISTS user_model_socials;
 DROP TABLE IF EXISTS users_info;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS admin_authentication_table_for_drop_form;
+DROP TABLE IF EXISTS form_pages;
+
+
+CREATE TABLE IF NOT EXISTS form_pages(
+	id INT AUTO_INCREMENT NOT NULL,
+    creator_id INT NOT NULL,
+	creator_name VARCHAR(30) NOT NULL,
+	form_name VARCHAR(30) NOT NULL,
+    used_time INT DEFAULT 0,
+    PRIMARY KEY (id),
+    creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Inserting a record with explicit values
+INSERT INTO form_pages (creator_id, creator_name, form_name) VALUES (1, 'ferivonus-admin', 'anime');
+INSERT INTO form_pages (creator_id, creator_name, form_name) VALUES (1, 'ferivonus-admin', 'manga');
+INSERT INTO form_pages (creator_id, creator_name, form_name) VALUES (1, 'ferivonus-admin', 'books');
+INSERT INTO form_pages (creator_id, creator_name, form_name) VALUES (1, 'ferivonus-admin', 'software');
+INSERT INTO form_pages (creator_id, creator_name, form_name) VALUES (1, 'ferivonus-admin', 'game');
+INSERT INTO form_pages (creator_id, creator_name, form_name) VALUES (1, 'ferivonus-admin', 'astrology');
+INSERT INTO form_pages (creator_id, creator_name, form_name) VALUES (1, 'ferivonus-admin', 'chatting');
+INSERT INTO form_pages (creator_id, creator_name, form_name) VALUES (1, 'ferivonus-admin', 'anime-girls');
+
 
 
 CREATE TABLE IF NOT EXISTS admin_authentication_table_for_drop_form (
