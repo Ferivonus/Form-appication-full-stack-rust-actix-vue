@@ -245,14 +245,14 @@ pub async fn get_user_by_email(
                 .map(|user| {
 
                     // Convert Option<chrono::DateTime<Utc>> to String
-                    let registration_date_string = user
+                    let registration_date_string: String = user
                         .registration_date
                         .map(|date| Utc.from_utc_datetime(&date.naive_utc()).format("%Y-%m-%d %H:%M:%S").to_string())
                         .unwrap_or_default();
 
-                        let last_login_date_string = user
+                        let last_login_date_string: String = user
                         .last_login_date
-                        .map(|date| Utc.from_utc_datetime(&date.naive_utc()).format("%Y-%m-%d %H:%M:%S").to_string())
+                        .map(|date: chrono::prelude::DateTime<Utc>| Utc.from_utc_datetime(&date.naive_utc()).format("%Y-%m-%d %H:%M:%S").to_string())
                         .unwrap_or_default();
 
 

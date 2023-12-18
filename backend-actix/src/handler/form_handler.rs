@@ -212,6 +212,8 @@ pub async fn delete_message_handler(
     path: web::Path<(String,)>,
 ) -> impl Responder {
 
+    
+
     // Use the random_string_identifier from the query parameters or request body
     //let random_string_identifier = opts.random_string_identifier.clone().unwrap_or_default();
 
